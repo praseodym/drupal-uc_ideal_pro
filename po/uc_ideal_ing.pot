@@ -1,0 +1,271 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# No version information was available in the source files.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2007-09-19 15:24+0200\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: uc_ideal_ing_payment.module:17
+msgid "IDEAL Payment Page"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:25
+msgid "IDEAL Payment transfer request"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:34
+msgid "IDEAL Payment status request"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:55;56
+msgid "Ideal ING Payment"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:57
+msgid "Ideal ING/Postbank payment method type."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:115;118
+msgid "Type:"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:118
+msgid "Unknown"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:166
+msgid "Description:"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:186
+msgid "privatekey"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:188
+msgid "The private key .pem file located in  thinmpi/security."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:192
+msgid "privatekeypass"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:194
+msgid "The private key password used for generating the key file."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:199
+msgid "privatecert"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:201
+msgid "The private certivicate .cer file located in  thinmpi/security."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:206
+msgid "authenticationtype"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:208
+msgid "Authentication type protocol. Leave SHA1_RSA default if unsure."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:213
+msgid "certificate0"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:215
+msgid "Certificate0 contains the signing certificate of your acquirer. This field should not be changed. Leave ideal.cer default if unsure."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:220
+msgid "acquirerurl"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:222
+msgid "Address of the iDEAL acquiring server. Use ssl://idealtest.secure-ing.com:443/ideal/iDeal during integration/test. Use ssl://ideal.secure-ing.com:443/ideal/iDeal only for production"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:227
+msgid "acquirertimeout"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:229
+msgid "Do not change AcquirerTimeout unless you have specific reasons to do so."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:234
+msgid "merchantid"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:236
+msgid "Default MerchantID enables you to test the example demoshop. Your own Merchant ID can be retrieved via the iDEAL Dashboard."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:241
+msgid "subid"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:243
+msgid "Do not change subID unless you have specific reasons to do so."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:247
+msgid "merchantreturnurl"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:249
+msgid "MerchantReturnURL is the URL on your system that the customer is redirected to after the iDEAL payment. Make shure to leave the \"cart/checkout/ideal_ing_statreq\" part intact. "
+msgstr ""
+
+#: uc_ideal_ing_payment.module:254
+msgid "currency"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:256
+msgid "Do not change currency unless you have specific reasons to do so"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:261
+msgid "expirationperiod"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:263
+msgid "ExpirationPeriod is the timeframe during which the transaction is allowed to take place. Maximum is PT1H (1 hour)."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:268;288;305
+msgid "language"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:270
+msgid "Language is only used for showing errormessages in the prefered language. nl/en."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:276
+msgid "Description"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:282
+msgid "default description"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:284
+msgid "Enable if you want to use a default description."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:290
+msgid "Used when you do not want to use transaction specific descriptions."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:295
+msgid "Default EntranceCode"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:299
+msgid "default entrancecode"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:301
+msgid "Enable if you want to use a entrance code."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:307
+msgid "Used when you do not want to use transaction specific entrance codes."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:312
+msgid "logfile"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:314
+msgid "Enable if you want a logfile \"thinmpi.log\" for debug purposes."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:353
+msgid "Payment through iDEAL gateway not possible."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:354
+msgid "Error message iDEAL"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:364
+msgid "List with banks not available, payment through iDEAL gateway not possible."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:385
+msgid "Choose your bank..."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:393
+msgid "Other banks"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:399
+msgid "Go to my bank"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:418
+msgid "Please choose the bank you have an account with..."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:419
+msgid "You will be returned to our shop after completing your IDEAL payment transaction."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:472
+msgid "Webshop order"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:474
+msgid "order#"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:538
+msgid "You have not chosen a bank for IDEAL payment. For security reasons your input is cleared, please try again"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:578
+msgid "Something went wrong in processing your IDEAL payment. IDEAL error:"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:614
+msgid "We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. IDEAL error:"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:620
+msgid "Your IDEAL payment has been canceled by you or by the IDEAL process. Please try again or go back to select another payment method."
+msgstr ""
+
+#: uc_ideal_ing_payment.module:629
+msgid "Thank you for shopping with us, your payment is processed sucessfuly"
+msgstr ""
+
+#: uc_ideal_ing_payment.module:0
+msgid "uc_ideal_ing_payment"
+msgstr ""
+
+#: uc_ideal_ing_payment.info:0
+msgid "Ideal Payment ING/Postbank"
+msgstr ""
+
+#: uc_ideal_ing_payment.info:0
+msgid "Receive payments through checkout via Ideal ING/Postbank."
+msgstr ""
+
+#: uc_ideal_ing_payment.info:0
+msgid "Ubercart - payment"
+msgstr ""
+

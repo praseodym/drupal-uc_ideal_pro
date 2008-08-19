@@ -1,0 +1,7 @@
+; $Id$
+name = Ideal Payment Pro
+description = Receive payments through checkout via Ideal ING/Postbank Advanced or Rabobank Professional.
+package = Ubercart - payment
+dependencies = uc_payment
+
+
