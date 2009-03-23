@@ -21,3 +21,22 @@ function uc_ideal_pro_payment_install() {
       break;
   }
 }
+
+function uc_ideal_pro_payment_uninstall(){
+  db_query("DROP TABLE IF EXISTS {uc_payment_ideal_pro}");
+  variable_del('ideal_pro_privatekey');
+  variable_del('ideal_pro_privatekeypass');
+  variable_del('ideal_pro_privatecert');
+  variable_del('ideal_pro_authenticationtype');
+  variable_del('ideal_pro_certificate0');
+  variable_del('ideal_pro_acquirerurl');
+  variable_del('ideal_pro_acquirertimeout');
+  variable_del('ideal_pro_merchantid');
+  variable_del('ideal_pro_subid');
+  variable_del('ideal_pro_currency');
+  variable_del('ideal_pro_expirationperiod');
+  variable_del('ideal_pro_language');
+  variable_del('ideal_pro_entrancecode');
+  variable_del('ideal_pro_entrancecode_check');
+  cache_clear_all('variables', 'cache');
+}

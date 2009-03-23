@@ -12,12 +12,21 @@
  */
 
 
+//First load include based on available lib
+$lib = uc_ideal_pro_get_lib();
+$path_module = drupal_get_path('module', 'uc_ideal_pro_payment');
+if ($lib == 'thinmpi'){
+  require_once($path_module.'/uc_deal_pro_thinmpi.inc.php');
+}
+elseif ($lib == 'connector'){
+  require_once($path_module.'/uc_deal_pro_connector.inc.php');
+}
 
 /*******************************************************************************
  * Hook Functions (Drupal)
  ******************************************************************************/
 
- /**
+/**
  * Implementation of hook_menu().
  */
 function uc_ideal_pro_payment_menu($may_cache) {
@@ -79,9 +88,8 @@ function uc_ideal_pro_payment_payment_method() {
  * Implementation of hook_order().
  */
 function uc_ideal_pro_payment_order($op, &$arg1, $arg2) {
-  //print_r($arg1);
   switch ($op) {
-    case 'submit': //Hier moet et gebeuren!
+    case 'submit':
         //Called at submit [Submit order]
         
         //Check if this is the chosen method
@@ -89,15 +97,13 @@ function uc_ideal_pro_payment_order($op, &$arg1, $arg2) {
             return theme_page(uc_ideal_pro_call($arg1, $arg2));
         }
       case 'load':
-        //echo 'load';
-        //Aangeroepen bij openen Review order na  submit 'review order'
+        //Called at openen Review order na  submit 'review order'
       break;
     
     case 'save':
-        //echo 'save';
-        //Aangeroepen bij submit [review order]
+      //Called at submit [review order]
       if ($arg1->payment_method == 'ideal_pro_payment') {
-        
+        //Nothing??
       }  
       break;
 
@@ -116,7 +122,6 @@ function uc_ideal_pro_payment_order($op, &$arg1, $arg2) {
  */
 
  function uc_payment_method_ideal_pro($op, $arg1) {
-// echo $op;
   switch($op) {
     case 'order-view':
     case 'customer-view':
@@ -185,10 +190,6 @@ function theme_uc_ideal_pro_payment_method_form($form) {
  ******************************************************************************/
 
 /**
- * ???
- */
-
-/**
  * Callback for payment gateway settings.
  */
 function uc_ideal_pro_payment_settings_form() {
@@ -196,7 +197,7 @@ function uc_ideal_pro_payment_settings_form() {
     '#type' => 'textfield',
     '#title' => t('privatekey'),
     '#default_value' => variable_get('ideal_pro_privatekey', 'priv.pem'),
-    '#description' => t('The private key .pem file located in  thinmpi/security.'),
+    '#description' => t('The private key .pem file located in  */security.'),
   );
   $form['ideal_pro_privatekeypass'] = array(
     '#type' => 'textfield',
@@ -209,7 +210,7 @@ function uc_ideal_pro_payment_settings_form() {
     '#type' => 'textfield',
     '#title' => t('privatecert'),
     '#default_value' => variable_get('ideal_pro_privatecert', 'cert.cer'),
-    '#description' => t('The private certificate .cer file located in  thinmpi/security.'),
+    '#description' => t('The private certificate .cer file located in  */security.'),
     '#required' => TRUE,
   );
   $form['ideal_pro_authenticationtype'] = array(
@@ -223,14 +224,14 @@ function uc_ideal_pro_payment_settings_form() {
     '#type' => 'textfield',
     '#title' => t('certificate0'),
     '#default_value' => variable_get('ideal_pro_certificate0', 'ideal.cer'),
-    '#description' => t('Certificate0 contains the signing certificate of your acquirer. This field should not be changed. Leave ideal.cer default if unsure.'),
+    '#description' => t('Certificate0 contains the signing certificate of your acquirer. This would probably be ideal.cer or webserver.cer.'),
     '#required' => TRUE,
   );
   $form['ideal_pro_acquirerurl'] = array(
     '#type' => 'textfield',
     '#title' => t('acquirerurl'),
     '#default_value' => variable_get('ideal_pro_acquirerurl', 'ssl://idealtest.secure-ing.com:443/ideal/iDeal'),
-    '#description' => t('Address of the iDEAL acquiring server. Use ssl://idealtest.secure-ing.com:443/ideal/iDeal during integration/test. Use ssl://ideal.secure-ing.com:443/ideal/iDeal only for production'),
+    '#description' => t('Address of the iDEAL acquiring server. Use ssl://idealtest.secure-ing.com:443/ideal/iDeal during integration/test. Use ssl://ideal.secure-ing.com:443/ideal/iDeal only for production. Look into integration documents for Rabo equivalents.'),
     '#required' => TRUE,
   );
   $form['ideal_pro_acquirertimeout'] = array(
@@ -253,13 +254,13 @@ function uc_ideal_pro_payment_settings_form() {
     '#default_value' => variable_get('ideal_pro_subid', '0'),
     '#description' => t('Do not change subID unless you have specific reasons to do so.'),
   );
-  $form['ideal_pro_merchantreturnurl'] = array(
+  /*$form['ideal_pro_merchantreturnurl'] = array( //Deprecated
     '#type' => 'textfield',
     '#title' => t('merchantreturnurl'),
     '#default_value' => variable_get('ideal_pro_merchantreturnurl', 'http://www.yoursite/cart/checkout/ideal_pro_statreq'),
     '#description' => t('MerchantReturnURL is the URL on your system that the customer is redirected to after the iDEAL payment. Make shure to leave the "cart/checkout/ideal_pro_statreq" part intact. '),
     '#required' => TRUE,
-  );
+  );*/
   $form['ideal_pro_currency'] = array(
     '#type' => 'textfield',
     '#title' => t('currency'),
@@ -318,185 +319,15 @@ function uc_ideal_pro_payment_settings_form() {
     '#description' => t('Used when you do not want to use transaction specific entrance codes.'),
   );
 
-  $form['ideal_pro_logfile'] = array(
+  /*$form['ideal_pro_logfile'] = array( //Deprecated
     '#type' => 'checkbox',
     '#title' => t('logfile'),
     '#default_value' => variable_get('ideal_pro_logfile', FALSE),
     '#description' => t('Enable if you want a logfile "thinmpi.log" for debug purposes.'),
-  );
+  );*/
 
   return $form;
 
-}
-
-function uc_ideal_pro_call(&$arg1, $arg2) {
-
-  $url_base = url(NULL, NULL, NULL, TRUE);
-
-  //test
-  //print_r($arg1);//    
-
-
-  //Set errors on so we can see if there is a PHP error goes wrong
-  //ini_set('display_errors',1);
-  //error_reporting(E_ALL & ~E_NOTICE);
-
-
-  /*START ThinMPI code*/
-  //include ThinMPI and Directory-request en -response
-  require_once(drupal_get_path('module', 'uc_ideal_pro_payment').'/thinmpi'."/ThinMPI.php");
-  require_once(drupal_get_path('module', 'uc_ideal_pro_payment').'/thinmpi'."/DirectoryRequest.php");
-  require_once(drupal_get_path('module', 'uc_ideal_pro_payment').'/thinmpi'."/DirectoryResponse.php");
-
-  /*Part2 ThinMPI code for DirReq*/
-
-  //Here comes the interesting part: the Directory Request itself.
-  //Create a directory request
-  $q_data = & new DirectoryRequest();
-  //Set parameters for directory request
-  
-  //Create thinMPI instance
-  $rule = new ThinMPI();
-
-  //Process directory request
-  $result = $rule->ProcessRequest($q_data);
-  
-  if(!$result->isOK())
-  {
-    $form_output.=t('Payment through iDEAL gateway not possible.').'<br>';
-    $form_output.=t('Error message iDEAL').': ';
-    $Msg = $result->getErrorMessage();
-    $form_output.=("$Msg<br>");
-  }
-  else
-  {
-    //Get issuerlist
-    $issuerArray = $result->getIssuerList();
-    if(count($issuerArray) == 0)
-    {
-      $form_output.=t('List with banks not available, payment through iDEAL gateway not possible.');
-    }
-    else
-    {
-      //Directory request succesful and at least 1 issuer
-      $form_output.='<form action="'.$url_base.'cart/checkout/ideal_pro_transreq" method="post" name="OrderForm">';
-      
-      for($i=0;$i<count($issuerArray);$i++)
-      {
-        if($issuerArray[$i]->issuerList == "Short")
-        {
-          $issuerArrayShort[]=$issuerArray[$i];
-        }
-        else
-        {
-          $issuerArrayLong[]=$issuerArray[$i];
-        }
-        
-      }
-        //Create a selection list
-      $form_output.='<select name="issuerID"  class="ideal_pro_dirreq_message_field">';
-      $form_output.='<option value="0">'.t('Choose your bank...').'</option>';
-      //Create an option tag for every issuer
-      for($i=0;$i<count($issuerArrayShort);$i++)
-      {
-        $form_output.=("<option value=\"{$issuerArrayShort[$i]->issuerID}\"> {$issuerArrayShort[$i]->issuerName} </option>");
-      }
-      if(count($issuerArrayLong) > 0)
-      {
-        $form_output.='<option value="0">---'.t('Other banks').'---</option>';
-      }
-      for($i=0;$i<count($issuerArrayLong);$i++)
-      {
-        $form_output.=("<option value=\"{$issuerArrayLong[$i]->issuerID}\"> {$issuerArrayLong[$i]->issuerName} </option>");
-      }
-      $form_output.='</select><br /><input class="ideal_pro_dirreq_message_button" name="Submit" type="submit" value="'.t('Go to my bank').' ->"></form>';
-    }
-  }
-  /*END ThinMPI code for DirReq*/
- 
-  $url_base = url(NULL, NULL, NULL, TRUE);
-
-  //Plain
-  //$redirect_accepturl = $url_base.'/cart/checkout/ideal_prook';
-  $redirect_declineurl = $url_base.'cart/checkout';
-  $redirect_exceptionurl = $url_base.'cart/checkout';
-  $redirect_cancelurl = $url_base.'cart/checkout/ideal_pro_cancel';
-
-  //$order_description = 'Expert Delivery order: '.$arg1->order_id;
-  //$customer_name = $arg1->delivery_first_name.' '.$arg1->delivery_last_name.' '.$arg1->delivery_company;
-  //$customer_email = $arg1->primary_email;
-  //$customer_zip = $arg1->delivery_postal_code;
-  //$customer_address = $arg1->delivery_street1.' '.$arg1->delivery_street2.' '.$arg1->delivery_street2.' '.$arg1->delivery_city;
-
-  $redirect_message1 = t('Please choose the bank you have an account with...');
-  $redirect_message2 = t('You will be returned to our shop after completing your IDEAL payment transaction.');
-
-  $orderid = $arg1->order_id;
-  $amount = $arg1->order_total * 100;   //amount *100
-
-  $_SESSION['ideal_pro_order_id'] = $arg1->order_id;
-  //Fill DirReq form session var
-  $_SESSION['ideal_pro_dirreq_form']='
-  <div class="ideal_pro_dirreq_message_top">
-  '.$redirect_message1.'
-  </div>
-  <div class="ideal_pro_dirreq_container">
-  <div align="right"><img src="https://www.qspeed.nl/httpsimg/lock.gif" alt="Secure Payment by Qrios" /></div>
-  <div align="center" class="ideal_pro_dirreq_form">
-  '.$form_output.'
-  </div>
-  <div class="ideal_pro_dirreq_message_bottom">
-  '.$redirect_message2.'
-  </div>
-  </div>'
-  ;
-  //Fill TransReq session var
-  $_SESSION['ideal_pro_transreq_data']= array(
-    'orderid' => $arg1->order_id,
-    'amount' => $arg1->order_total * 100,   //amount *100
-  );
-  drupal_goto('cart/checkout/ideal_pro_dirreq');
-  exit;
-}
-
-
-/*Get configuration*/
-function LoadConfiguration() {
-  $url_base = url(NULL, NULL, NULL, TRUE);
-  //Load configuration in array
-  $arr_conf = array(
-    'PRIVATEKEY' =>         variable_get('ideal_pro_privatekey', 'priv.pem'),
-    'PRIVATEKEYPASS' =>     variable_get('ideal_pro_privatekeypass', FALSE),
-    'PRIVATECERT' =>        variable_get('ideal_pro_privatecert', 'cert.cer'),
-    'AUTHENTICATIONTYPE' => variable_get('ideal_pro_authenticationtype', 'SHA1_RSA'),
-    'CERTIFICATE0' =>       variable_get('ideal_pro_certificate0', 'ideal.cer'),
-    //'CERTIFICATE1' => 'portecenter.cer', //Nodig? Nee
-    'ACQUIRERURL' =>        variable_get('ideal_pro_acquirerurl', 'ssl://idealtest.secure-ing.com:443/ideal/iDeal'),
-    'ACQUIRERTIMEOUT' =>    variable_get('ideal_pro_acquirertimeout', 10),
-    'MERCHANTID' =>         variable_get('ideal_pro_merchantid', '000000000'),
-    'SUBID' =>              variable_get('ideal_pro_subid', 0),
-    'MERCHANTRETURNURL' =>  variable_get('ideal_pro_merchantreturnurl', $url_base.'cart/checkout/ideal_procancel'),
-    'CURRENCY' =>           variable_get('ideal_pro_currency', 'EUR'),
-    'EXPIRATIONPERIOD' =>   variable_get('ideal_pro_expirationperiod', 'PT10M'),
-    'LANGUAGE' =>           variable_get('ideal_pro_language', 'nl'),
-    //debug
-    'LOGFILE' =>           variable_get('ideal_pro_logfile', 'thinmpi.log'),
-    );
-    //LET OP, 'DESCRIPTION' mag max. 32 karakters zijn!!
-    if (variable_get('ideal_pro_description_check', FALSE) == TRUE) {
-      $arr_conf['DESCRIPTION'] = variable_get('uc_store_name', 'Webshop').' '.t('order#'). $_SESSION['ideal_pro_order_id'];
-    }else{
-      $arr_conf['DESCRIPTION'] = variable_get('uc_store_name', 'Webshop').' '.t('order#'). $_SESSION['ideal_pro_order_id'];
-    }
-    if (variable_get('ideal_pro_entrancecode_check', FALSE) == TRUE) {
-      $arr_conf['ENTRANCECODE'] = variable_get('ideal_pro_entrancecode', 15674022);
-    }else{
-      $arr_conf['ENTRANCECODE'] = $_SESSION['ideal_pro_order_id'];
-    }
-  //debug
-  //print_r( $arr_conf);
-  //exit;
-  return $arr_conf;
 }
 
 /*Redirect/return helper functions*/
@@ -505,151 +336,65 @@ function uc_ideal_pro_dirreq_form() {
     drupal_add_css(drupal_get_path('module', 'uc_ideal_pro_payment') .'/uc_ideal_pro_payment_form.css');
     $ideal_pro_form = $_SESSION['ideal_pro_dirreq_form'];
     $_SESSION['ideal_pro_dirreq_form'] = FALSE;
-    return($ideal_pro_form );
-    //exit;
+    return($ideal_pro_form.' ' );
   }else{
     drupal_goto('cart/');
   }
 }
 
-function uc_ideal_pro_transreq_call() {
-  if ($_SESSION['ideal_pro_transreq_data'] !== FALSE) {
-    //drupal_add_css(drupal_get_path('module', 'uc_ideal_pro_payment') .'/uc_ideal_pro_payment_form.css');
-    $order_data = $_SESSION['ideal_pro_transreq_data'];
-    $orderid = $order_data['orderid'];
-    $amount = $order_data['amount'];
-    $_SESSION['ideal_pro_transreq_data'] = FALSE;
-    
-    
-    /*START ThinMPI code for TransrReq*/
-    require_once(drupal_get_path('module', 'uc_ideal_pro_payment')."/thinmpi/ThinMPI.php");
-    require_once(drupal_get_path('module', 'uc_ideal_pro_payment')."/thinmpi/AcquirerTrxRequest.php");
-
-    $issuerID = $_POST['issuerID'];
+/*Get configuration*/
+function LoadConfiguration() {
+  $url_base = url(NULL, NULL, NULL, TRUE);
+  //Load configuration in array
+  $arr_conf = array(
+    'PRIVATEKEY' =>         filter_xss(variable_get('ideal_pro_privatekey', 'priv.pem')),
+    'PRIVATEKEYPASS' =>     filter_xss(variable_get('ideal_pro_privatekeypass', FALSE)),
+    'PRIVATECERT' =>        filter_xss(variable_get('ideal_pro_privatecert', 'cert.cer')),
+    'AUTHENTICATIONTYPE' => filter_xss(variable_get('ideal_pro_authenticationtype', 'SHA1_RSA')),
+    'CERTIFICATE0' =>       filter_xss(variable_get('ideal_pro_certificate0', 'ideal.cer')),
+    'ACQUIRERURL' =>        filter_xss(variable_get('ideal_pro_acquirerurl', 'ssl://idealtest.secure-ing.com:443/ideal/iDeal')),
+    'ACQUIRERTIMEOUT' =>    filter_xss(variable_get('ideal_pro_acquirertimeout', 10)),
+    'MERCHANTID' =>         check_plain(variable_get('ideal_pro_merchantid', '000000000')),
+    'SUBID' =>              filter_xss(variable_get('ideal_pro_subid', 0)),
+    'MERCHANTRETURNURL' =>  $url_base.'cart/checkout/ideal_pro_statreq',
+    'CURRENCY' =>           filter_xss(variable_get('ideal_pro_currency', 'EUR')),
+    'EXPIRATIONPERIOD' =>   filter_xss(variable_get('ideal_pro_expirationperiod', 'PT10M')),
+    'LANGUAGE' =>           filter_xss(variable_get('ideal_pro_language', 'nl')),
     //debug
-    //echo $issuerID;
-    if($issuerID==0)
-    {
-      drupal_set_message(t('You have not chosen a bank for IDEAL payment. For security reasons your input is cleared, please try again'));
-      drupal_goto('cart/checkout');
-    }
-    
-    //Create TransactionRequest
-    $q_data = & new AcquirerTrxRequest();
-    
-    //Set parameters for TransactionRequest
-    $q_data -> setIssuerID($issuerID);
-  	$q_data -> setPurchaseID($orderid);
-  	$q_data -> setAmount($amount );
-  	//Create ThinMPI instance
-  	$rule = new ThinMPI();
-  	$result = new AcquirerTrxResponse();
-    //debug
-    //print_r($q_data);
-    //exit;
-    
-  	//Process Request
-  	$result = $rule->ProcessRequest( $q_data );
-  	
-  	if($result->isOK()){
-  		$transactionID = $result->getTransactionID();
-      $status = 0;
-      //transactionID opslaan in dbs
-      //db_query("UPDATE {uc_payment_ideal_pro} SET transaction_id = %d WHERE order_id = %d", $transactionID, $orderid);
-      db_query("INSERT INTO uc_payment_ideal_pro (order_id, description, order_status, transaction_id) VALUES('$orderid','$description','$status','$transactionID')");
+    //'LOGFILE' =>           filter_xss(variable_get('ideal_pro_logfile', 'ideal_log.log')),
+  );
 
-  		//Get IssuerURL and decode it
-  		$ISSURL = $result->getIssuerAuthenticationURL();
-  		$ISSURL = html_entity_decode($ISSURL);
-      //debug
-      //echo $transactionID;
-      //exit;
-  		//Redirect the browser to the issuer URL
-  		header("Location: $ISSURL"); 
-  		exit();
-      
-  	}else{
-  		//TransactionRequest failed, inform the consumer
-  		$Msg = $result->getErrorMessage();
-  		drupal_set_message(t('Something went wrong in processing your IDEAL payment. IDEAL error:').'<br>'.$Msg);
-      drupal_goto('cart/checkout');
-  	}
-    
-    /*END ThinMPI code for TransrReq*/
-    
-    return($ideal_pro_form );
-    //exit;
+  //IMPORTANT, 'DESCRIPTION' is bound to max. 32 chars!!
+  if (variable_get('ideal_pro_description_check', FALSE) == TRUE) {
+    $arr_conf['DESCRIPTION'] = variable_get('uc_store_name', 'Webshop').' '.t('order#'). $_SESSION['ideal_pro_order_id'];
   }else{
-    drupal_goto('cart/');
+    $arr_conf['DESCRIPTION'] = variable_get('uc_store_name', 'Webshop').' '.t('order#'). $_SESSION['ideal_pro_order_id'];
   }
+  if (variable_get('ideal_pro_entrancecode_check', FALSE) == TRUE) {
+    $arr_conf['ENTRANCECODE'] = variable_get('ideal_pro_entrancecode', 15674022);
+  }else{
+    $arr_conf['ENTRANCECODE'] = $_SESSION['ideal_pro_order_id'];
+  }
+
+  return $arr_conf;
 }
 
-function uc_ideal_pro_statreq_call($arg1, $arg2) {
-  $transaction_id= $_GET['trxid'];
-  $order_id = $_GET['ec'];
-  //echo $transaction_id;
-
-  /*START ThinMPI code for TransrReq*/
-  require_once(drupal_get_path('module', 'uc_ideal_pro_payment')."/thinmpi/ThinMPI.php");
-  require_once(drupal_get_path('module', 'uc_ideal_pro_payment')."/thinmpi/AcquirerStatusRequest.php");
-
-	//Create StatusRequest
-	$q_data = & new AcquirerStatusRequest();
-  
-  $transID = str_pad($transaction_id, 16, "0");
-	$q_data -> setTransactionID($transID);
-
-	//Create ThinMPI instance and process request
-	$rule = new ThinMPI();
-	$result = $rule->ProcessRequest( $q_data );
-	
-	if(!$result->isOK())
-	{
-		//StatusRequest failed, let the consumer click to try again
-    $Msg = $result->getErrorMessage();
-    drupal_set_message(t('We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. IDEAL error:')).'<br>'.$Msg;
-    drupal_goto('cart/checkout');
-	}
-	else if(!$result->isAuthenticated())
-	{
-		//Transaction failed, inform the consumer
-		drupal_set_message(t('Your IDEAL payment has been canceled by you or by the IDEAL process. Please try again or go back to select another payment method.'), 'ERROR');
-    if ($order_id == $_SESSION['ideal_pro_order_id']) { //Check if orer_id is valid
-      // This lets us know it's a legitimate access of the review page.
-      $_SESSION['do_review'] = TRUE;
-      // Ensure the cart we're looking at is the one that payment was attempted for.
-      $_SESSION['cart_order'] = uc_cart_get_id();
-      drupal_goto('cart/checkout/review');
-    }else{
-        drupal_goto('cart');
-    }
-	}else{
-		drupal_set_message(t('Thank you for shopping with us, your payment is processed sucessfuly'));
-		$transactionID = $result->getTransactionID();
-		//Here you should retrieve the order from the database, mark it as "payed"
-    $order = uc_order_load($order_id);
-    if ($order == FALSE) { //Check if order exist
-      watchdog('uc_ideal_pro_payment', t('iDeal payment completion attempted for non-existent order.'), WATCHDOG_ERROR);
-      return;
-    }
-    //uc_order_update_status($order_id, 1);   *Uitgezet 281107 KK
-    uc_order_update_status($order->order_id, uc_order_state_default('post_checkout'));
-    //uc_payment_enter($order_id, 'ideal_pro', $payment_amount, $order->uid, NULL, $comment);
-    //uc_cart_complete_sale($order);
-    //uc_order_comment_save($order_id, 0, t('iDeal Pro reported a payment of !amount !currency.', array('!amount' => uc_currency_format($payment_amount, FALSE), '!currency' => $payment_currency)), 'admin');
-    
-    unset($_SESSION['ideal_pro_order_id']);
-    // This lets us know it's a legitimate access of the complete page.
-    $_SESSION['do_complete'] = TRUE;
-
-    // Ensure the cart we're looking at is the one that payment was attempted for.
-    //$cart_id = uc_cart_get_id();
-    //$_SESSION['cart_order'] = $cart_id;
-
-    //$_SESSION['ideal_proreturn_key_ok'] = FALSE;
-    drupal_goto('cart/checkout/complete');
-    exit();
+/*Lookup installed PHP iDEAL lib*/
+function uc_ideal_pro_get_lib() {
+  $path_module = drupal_get_path('module', 'uc_ideal_pro_payment');
+  if (file_exists($path_module.'/lib/ThinMPI.php')) {
+    $lib = 'thinmpi'; //Rabo + old ING
   }
-  //exit;
+  elseif (file_exists($path_module.'/lib/iDEALConnector.php')) {
+    $lib = 'connector'; //New ING
+  }
+  else{
+    //No lib available
+    watchdog('uc_ideal_pro_payment', t('iDEAL PHP librairy not found in /lib.'), WATCHDOG_ERROR);
+    drupal_set_message(t('iDEAL PHP librairy not found in /lib.'), 'ERROR');
+    return;
+  }
+  return $lib;
 }
+
 ?>
