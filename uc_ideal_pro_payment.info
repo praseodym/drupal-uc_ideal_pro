@@ -1,7 +1,7 @@
 ; $Id$
 name = Ideal Payment Pro
-description = Receive payments through checkout via Ideal ING/Postbank Advanced or Rabobank Professional.
+description = Receive payments through checkout via Ideal ING/Postbank Advanced,  Rabo Professional or Fortis iDEAL.
 package = Ubercart - payment
-dependencies = uc_payment
+core = 6.x
 
 

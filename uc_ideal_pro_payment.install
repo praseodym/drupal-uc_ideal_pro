@@ -1,29 +1,79 @@
-<?php
-// $Id$
+<?php // $Id$
+
+/**
+ * Implementation of hook_schema().
+ */
+function uc_ideal_pro_payment_schema() {
+  $schema['uc_ideal_pro_payment'] = array(
+    'description' => t('Table for iDEAL payments.'),
+    'fields' => array(
+      'order_id' => array(
+        'description' => t('Ubercart order id'),
+        'type' => 'int',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      'transaction_id' => array(
+        'description' => t('Transaction id'),
+        'type' => 'int',
+        'size' => 'medium',
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'description' => t('Description'),
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'order_status' => array(
+        'description' => t('Order payment status'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+      ),
+      'return_succes' => array(
+        'description' => t('Returned succes value'),
+        'type' => 'text',
+        'size' => 'small',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('order_id'),
+  );
+
+  return $schema;
+}
 
 /**
  * Implementation of hook_install().
  */
 function uc_ideal_pro_payment_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {uc_payment_ideal_pro} (
-        order_id mediumint(9) NOT NULL,
-        transaction_id mediumint(9) NOT NULL,
-        description varchar(64) NOT NULL,
-        order_status tinyint(4) NOT NULL,
-        return_succes tinytext NOT NULL,
-        PRIMARY KEY  (order_id)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
-      break;
-    case 'pgsql':
-      break;
-  }
+  // Create tables.
+  drupal_install_schema('uc_ideal_pro_payment');
+  // switch ($GLOBALS['db_type']) {
+    // case 'mysql':
+    // case 'mysqli':
+      // db_query("CREATE TABLE {uc_payment_ideal_pro} (
+        // order_id mediumint(9) NOT NULL,
+        // transaction_id mediumint(9) NOT NULL,
+        // description varchar(64) NOT NULL,
+        // order_status tinyint(4) NOT NULL,
+        // return_succes tinytext NOT NULL,
+        // PRIMARY KEY  (order_id)
+      // ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      // break;
+    // case 'pgsql':
+      // break;
+  // }
+  
 }
 
+/**
+ * Implementation of hook_uninstall().
+ */
 function uc_ideal_pro_payment_uninstall(){
-  db_query("DROP TABLE IF EXISTS {uc_payment_ideal_pro}");
+  //db_query("DROP TABLE IF EXISTS {uc_payment_ideal_pro}");
+  //drupal_uninstall_schema('uc_ideal_pro_payment');
   variable_del('ideal_pro_privatekey');
   variable_del('ideal_pro_privatekeypass');
   variable_del('ideal_pro_privatecert');

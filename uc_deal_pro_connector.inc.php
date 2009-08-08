@@ -13,7 +13,8 @@
 
 function uc_ideal_pro_call(&$arg1, $arg2) {
 
-  $url_base = url(NULL, NULL, NULL, TRUE);
+  $url_base = url(NULL, array('absolute' => TRUE));
+  //$url_base = url(NULL, NULL, NULL, TRUE);
   $path_module = drupal_get_path('module', 'uc_ideal_pro_payment');
   ////Set errors on so we can see if there is a PHP error goes wrong
   //ini_set('display_errors',1);
@@ -61,7 +62,8 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   }
   /*END ThinMPI code for DirReq*/
  
-  $url_base = url(NULL, NULL, NULL, TRUE);
+  $url_base = url(NULL, array('absolute' => TRUE));
+  //$url_base = url(NULL, NULL, NULL, TRUE);
 
   $redirect_declineurl = $url_base.'cart/checkout';
   $redirect_exceptionurl = $url_base.'cart/checkout';
@@ -73,7 +75,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   $orderid = $arg1->order_id;
   $amount = $arg1->order_total * 100;   //amount *100
 
-  $_SESSION['ideal_pro_order_id'] = $arg1->order_id;
+  $_SESSION['ideal_pro_order_id'] = $orderid;
   //Fill DirReq form session var
   $_SESSION['ideal_pro_dirreq_form']='
   <div class="ideal_pro_dirreq_message_top">
@@ -139,7 +141,7 @@ function uc_ideal_pro_transreq_call() {
     if (!$response->errCode){
   		$transactionID = $response->getTransactionID();
       //transactionID save in dbs
-      db_query("INSERT INTO uc_payment_ideal_pro (order_id, description, order_status, transaction_id) VALUES('$orderid','$description','$status','$transactionID')");
+      db_query("INSERT INTO uc_ideal_pro_payment (order_id, description, order_status, transaction_id) VALUES('$orderid','$description','$status','$transactionID')");
 
   		//Get IssuerURL and decode it
   		$ISSURL = $response->getIssuerAuthenticationURL();
@@ -189,7 +191,7 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
     drupal_set_message(t('We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. IDEAL error:')).'<br>'.$msg;
     drupal_goto('cart/checkout');
 	}
-	elseif(!$response->status == 1){
+	elseif($response->status != 1){
 		//Transaction failed, inform the consumer
 		drupal_set_message(t('Your IDEAL payment has been canceled by you or by the IDEAL process. Please try again or go back to select another payment method.'), 'ERROR');
     if ($order_id == $_SESSION['ideal_pro_order_id']) { //Check if orer_id is valid

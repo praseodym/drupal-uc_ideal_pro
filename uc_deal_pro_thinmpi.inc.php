@@ -13,7 +13,7 @@
 
 function uc_ideal_pro_call(&$arg1, $arg2) {
 
-  $url_base = url(NULL, NULL, NULL, TRUE);
+  $url_base = url(NULL, array('absolute' => TRUE));
   $path_module = drupal_get_path('module', 'uc_ideal_pro_payment');
   ////Set errors on so we can see if there is a PHP error goes wrong
   //ini_set('display_errors',1);
@@ -75,7 +75,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   }
   /*END ThinMPI code for DirReq*/
  
-  $url_base = url(NULL, NULL, NULL, TRUE);
+  $url_base = url(NULL, array('absolute' => TRUE));
 
   $redirect_declineurl = $url_base.'cart/checkout';
   $redirect_exceptionurl = $url_base.'cart/checkout';
@@ -87,7 +87,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   $orderid = $arg1->order_id;
   $amount = $arg1->order_total * 100;   //amount *100
 
-  $_SESSION['ideal_pro_order_id'] = $arg1->order_id;
+  $_SESSION['ideal_pro_order_id'] = $orderid;
   //Fill DirReq form session var
   $_SESSION['ideal_pro_dirreq_form']='
   <div class="ideal_pro_dirreq_message_top">
@@ -149,7 +149,7 @@ function uc_ideal_pro_transreq_call() {
   		$transactionID = $result->getTransactionID();
       $status = 0;
       //transactionID save in dbs
-      db_query("INSERT INTO uc_payment_ideal_pro (order_id, description, order_status, transaction_id) VALUES('$orderid','$description','$status','$transactionID')");
+      db_query("INSERT INTO uc_ideal_pro_payment (order_id, description, order_status, transaction_id) VALUES('$orderid','$description','$status','$transactionID')");
 
   		//Get IssuerURL and decode it
   		$ISSURL = $result->getIssuerAuthenticationURL();
@@ -179,7 +179,6 @@ function uc_ideal_pro_transreq_call() {
 function uc_ideal_pro_statreq_call($arg1, $arg2) {
   $transaction_id= $_GET['trxid'];
   $order_id = $_GET['ec'];
-  //echo $transaction_id;
 
   /*START ThinMPI code for TransrReq*/
   require_once(drupal_get_path('module', 'uc_ideal_pro_payment')."/lib/ThinMPI.php");
@@ -195,11 +194,6 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 	$rule = new ThinMPI();
 	$result = $rule->ProcessRequest( $q_data );
 	
-  //Debug
-  //print_r($result);
-  //echo $result->ok;
-  //exit;
-
 	if($result->ok != 1)
 	{
 		//StatusRequest failed, let the consumer click to try again
