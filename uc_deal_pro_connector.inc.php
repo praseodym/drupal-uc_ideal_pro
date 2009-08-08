@@ -189,7 +189,7 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
     drupal_set_message(t('We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. IDEAL error:')).'<br>'.$msg;
     drupal_goto('cart/checkout');
 	}
-	elseif(!$response->status == 1){
+	elseif($response->status != 1){
 		//Transaction failed, inform the consumer
 		drupal_set_message(t('Your IDEAL payment has been canceled by you or by the IDEAL process. Please try again or go back to select another payment method.'), 'ERROR');
     if ($order_id == $_SESSION['ideal_pro_order_id']) { //Check if orer_id is valid
