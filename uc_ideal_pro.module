@@ -246,7 +246,8 @@ function uc_payment_method_ideal_pro_form($form_state, $order) {
 function uc_ideal_pro_pay($order) {
   _uc_ideal_pro_load_library();
   
-  $desc = _uc_ideal_pro_product_details($order->products);
+  $desc = t('Order number @id (@count products).',
+    array('@id' => $order->order_id, '@count' => $order->product_count));
   $ec = sha1($order->created . $order->order_total . $order->primary_email);
   $trx_req = new TransactionRequest();
   
@@ -496,18 +497,6 @@ function _uc_ideal_pro_refresh_status($order, $trx_id) {
   }
   
   return $status;
-}
-
-function _uc_ideal_pro_product_details($products) {
-  $total = 0;
-
-  if (!empty($products)) {
-    foreach ($products as $product) {
-      $subtotal += $item->qty;
-    }
-  }
-
-  return t('Order with %d products.', $total);
 }
 
 function _uc_ideal_pro_trx_status($status) {

@@ -8,7 +8,6 @@ Installation:
 - Enable the module and configure it on the Ubercart payment method settings page.
 
 TODO:
-- Manual status check
 - Dutch translation
 
 Author:
