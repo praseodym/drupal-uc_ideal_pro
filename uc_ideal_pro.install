@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * @file
+ * Installation file for iDEAL Professional. Database is used to log transaction IDs.
+ */
+
+/**
+ * Implementation of hook_requirements().
+ */
+function uc_ideal_pro_requirements($phase) {
+  $t = get_t();
+
+  $has_openssl = function_exists('openssl_sign');
+  $has_php5 = version_compare(PHP_VERSION, '5', '>=');
+
+  if (!$has_openssl) {
+    $requirements['uc_ideal_pro_openssl']['severity'] = REQUIREMENT_ERROR;
+    $requirements['uc_ideal_pro_openssl']['description'] = $t("iDEAL Professional requires the PHP <a href='!openssl_url'>OpenSSL</a> library.", array('!openssl_url' => 'http://php.net/manual/en/openssl.setup.php'));
+  }
+  
+  if (!$has_php5) {
+    $requirements['uc_ideal_pro_php5']['severity'] = REQUIREMENT_ERROR;
+    $requirements['uc_ideal_pro_php5']['description'] = $t("iDEAL Professional requires PHP version 5.");
+  }
+  return $requirements;
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function uc_ideal_pro_schema() {
+  $schema = array();
+
+  $schema['uc_payment_ideal'] = array(
+    'description' => t('Logs iDEAL transaction statuses.'),
+    'fields' => array(
+      'order_id' => array(
+        'description' => t('The Ubercart order ID.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'trx_id' => array(
+        'description' => t('The transaction ID from iDEAL.'),
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'description' => t('The transaction status from iDEAL.'),
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'received' => array(
+        'description' => t('The transaction status timestamp.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'order_id' => array('order_id'),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function uc_ideal_pro_install() {
+  drupal_install_schema('uc_ideal_pro');
+
+  $t = get_t();
+  db_query("INSERT INTO {uc_order_statuses} (order_status_id, title, state, weight, locked) VALUES ('ideal_pending', '%s', 'payment_received', 7, 1);", $t('iDEAL pending'));
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uc_ideal_pro_uninstall() {
+  drupal_uninstall_schema('uc_ideal_pro');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'uc_ideal_pro_%%'");
+}
