@@ -3,12 +3,12 @@
 
 /**
  * @file
- * iDEAL payment module for Ubercart. No extra gateway needed. 
+ * iDEAL payment module for Ubercart. No extra gateway needed.
  * Include for iDEAL ING/PB Advanced & RABO Professional ThinMPI
  *
  * Development by Qrios | http://www.qrios.nl | c.kodde {at} qrios {dot} nl
- * 
- * 
+ *
+ *
  */
 
 function uc_ideal_pro_call(&$arg1, $arg2) {
@@ -26,7 +26,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
 
   //Create a directory request
   $q_data = & new DirectoryRequest();
-  
+
   //Create thinMPI instance
   $rule = new ThinMPI();
 
@@ -48,7 +48,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
     else{
       //Directory request succesful and at least 1 issuer
       $form_output.='<form action="'.$url_base.'cart/checkout/ideal_pro_transreq" method="post" name="OrderForm">';
-      
+
       for($i=0;$i<count($issuerArray);$i++){
         if($issuerArray[$i]->issuerList == "Short"){
           $issuerArrayShort[]=$issuerArray[$i];
@@ -74,7 +74,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
     }
   }
   /*END ThinMPI code for DirReq*/
- 
+
   $url_base = url(NULL, NULL, NULL, TRUE);
 
   $redirect_declineurl = $url_base.'cart/checkout';
@@ -82,7 +82,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   $redirect_cancelurl = $url_base.'cart/checkout/ideal_pro_cancel';
 
   $redirect_message1 = t('Please choose the bank you have an account with...');
-  $redirect_message2 = t('You will be returned to our shop after completing your IDEAL payment transaction.');
+  $redirect_message2 = t('You will be returned to our shop after completing your iDEAL payment transaction.');
 
   $orderid = $arg1->order_id;
   $amount = $arg1->order_total * 100;   //amount *100
@@ -118,22 +118,22 @@ function uc_ideal_pro_transreq_call() {
     $order_data = $_SESSION['ideal_pro_transreq_data'];
     $orderid = $order_data['orderid'];
     $amount = $order_data['amount'];
-    
+
     unset($_SESSION['ideal_pro_transreq_data']);
-    
+
     /*START ThinMPI code for TransrReq*/
     require_once(drupal_get_path('module', 'uc_ideal_pro_payment')."/lib/ThinMPI.php");
     require_once(drupal_get_path('module', 'uc_ideal_pro_payment')."/lib/AcquirerTrxRequest.php");
 
     $issuerID = check_plain($_POST['issuerID']);
     if(!$issuerID){
-      drupal_set_message(t('You have not chosen a bank for IDEAL payment. For security reasons your input is cleared, please try again'));
+      drupal_set_message(t('You have not chosen a bank for iDEAL payment. For security reasons your input is cleared, please try again'));
       drupal_goto('cart/checkout');
     }
-    
+
     //Create TransactionRequest
     $q_data = & new AcquirerTrxRequest();
-    
+
     //Set parameters for TransactionRequest
     $q_data -> setIssuerID($issuerID);
   	$q_data -> setPurchaseID($orderid);
@@ -141,10 +141,10 @@ function uc_ideal_pro_transreq_call() {
   	//Create ThinMPI instance
   	$rule = new ThinMPI();
   	$result = new AcquirerTrxResponse();
-    
+
   	//Process Request
   	$result = $rule->ProcessRequest( $q_data );
-  	
+
   	if($result->isOK()){
   		$transactionID = $result->getTransactionID();
       $status = 0;
@@ -156,18 +156,18 @@ function uc_ideal_pro_transreq_call() {
   		$ISSURL = html_entity_decode($ISSURL);
 
   		//Redirect the browser to the issuer URL
-  		header("Location: $ISSURL"); 
+  		header("Location: $ISSURL");
   		exit();
-      
+
   	}else{
   		//TransactionRequest failed, inform the consumer
   		$Msg = $result->getErrorMessage();
-  		drupal_set_message(t('Something went wrong in processing your IDEAL payment. IDEAL error:').'<br>'.$Msg);
+  		drupal_set_message(t('Something went wrong in processing your iDEAL payment. iDEAL error:').'<br>'.$Msg);
       drupal_goto('cart/checkout');
   	}
-    
+
     /*END ThinMPI code for TransrReq*/
-    
+
     return($ideal_pro_form );
   }
   else{
@@ -187,14 +187,14 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 
 	//Create StatusRequest
 	$q_data = & new AcquirerStatusRequest();
-  
+
   $transID = str_pad($transaction_id, 16, "0");
 	$q_data -> setTransactionID($transID);
 
 	//Create ThinMPI instance and process request
 	$rule = new ThinMPI();
 	$result = $rule->ProcessRequest( $q_data );
-	
+
   //Debug
   //print_r($result);
   //echo $result->ok;
@@ -204,13 +204,13 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 	{
 		//StatusRequest failed, let the consumer click to try again
     $msg = $result->errorMessage;
-    drupal_set_message(t('We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. IDEAL error: ').'<br>'.$msg, ERROR);
+    drupal_set_message(t('We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. iDEAL error: ').'<br>'.$msg, ERROR);
     drupal_goto('cart/checkout');
 	}
 	else if(!$result->authenticated)
 	{
 		//Transaction failed, inform the consumer
-		drupal_set_message(t('Your IDEAL payment has been canceled by you or by the IDEAL process. Please try again or go back to select another payment method.'), ERROR);
+		drupal_set_message(t('Your iDEAL payment has been canceled by you or by the iDEAL process. Please try again or go back to select another payment method.'), ERROR);
     if ($order_id == $_SESSION['ideal_pro_order_id']) { //Check if orer_id is valid
       // This lets us know it's a legitimate access of the review page.
       $_SESSION['do_review'] = TRUE;
@@ -226,17 +226,17 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 		//Here you should retrieve the order from the database, mark it as "payed"
     $order = uc_order_load($order_id);
     if ($order == FALSE) { //Check if order exist
-      watchdog('uc_ideal_pro_payment', t('iDeal payment completion attempted for non-existent order.'), WATCHDOG_ERROR);
+      watchdog('uc_ideal_pro_payment', t('iDEAL payment completion attempted for non-existent order.'), WATCHDOG_ERROR);
       return;
     }
     //uc_order_update_status($order_id, 1);   *Uitgezet 281107 KK
     uc_order_update_status($order->order_id, uc_order_state_default('payment_received'));
-    
+
     //Todo??
     //uc_payment_enter($order_id, 'ideal_pro', $payment_amount, $order->uid, NULL, $comment);
     //uc_cart_complete_sale($order);
-    //uc_order_comment_save($order_id, 0, t('iDeal Pro reported a payment of !amount !currency.', array('!amount' => uc_currency_format($payment_amount, FALSE), '!currency' => $payment_currency)), 'admin');
-    
+    //uc_order_comment_save($order_id, 0, t('iDEAL Pro reported a payment of !amount !currency.', array('!amount' => uc_currency_format($payment_amount, FALSE), '!currency' => $payment_currency)), 'admin');
+
     unset($_SESSION['ideal_pro_order_id']);
     // This lets us know it's a legitimate access of the complete page.
     $_SESSION['do_complete'] = TRUE;

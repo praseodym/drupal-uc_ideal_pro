@@ -3,12 +3,12 @@
 
 /**
  * @file
- * iDEAL payment module for Ubercart. No extra gateway needed. 
+ * iDEAL payment module for Ubercart. No extra gateway needed.
  * Include For iDEAL ING/PB Advanced Connector
  *
  * Development by Qrios | http://www.qrios.nl | c.kodde {at} qrios {dot} nl
- * 
- * 
+ *
+ *
  */
 
 function uc_ideal_pro_call(&$arg1, $arg2) {
@@ -28,9 +28,9 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   //Process directory request
 	$response = $iDEALConnector->GetIssuerList();
 
-  //NOT USED?  
-  //$errorCode = $response->getErrorCode(); 
-  //$consumerMessage = $response->getConsumerMessage(); 
+  //NOT USED?
+  //$errorCode = $response->getErrorCode();
+  //$consumerMessage = $response->getConsumerMessage();
 
   if ($response->errCode){
     //echo 'error';
@@ -41,14 +41,14 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   }
   else{
     //Get issuerlist
-    $issuerArray = $response->issuerShortList; 
+    $issuerArray = $response->issuerShortList;
     if(count($issuerArray) == 0){
       $form_output.=t('List with banks not available, payment through iDEAL gateway not possible.');
     }
     else{
       //Directory request succesful and at least 1 issuer
       $form_output.='<form action="'.$url_base.'cart/checkout/ideal_pro_transreq" method="post" name="OrderForm">';
-      
+
       //Create a selection list
       $form_output.='<select name="issuerID"  class="ideal_pro_dirreq_message_field">';
       $form_output.='<option value="0">'.t('Choose your bank...').'</option>';
@@ -60,7 +60,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
     }
   }
   /*END ThinMPI code for DirReq*/
- 
+
   $url_base = url(NULL, NULL, NULL, TRUE);
 
   $redirect_declineurl = $url_base.'cart/checkout';
@@ -119,12 +119,12 @@ function uc_ideal_pro_transreq_call() {
     $merchantReturnURL = $iDEALConnector->config['MERCHANTRETURNURL'];
 
     unset($_SESSION['ideal_pro_transreq_data']);
-    
+
     if(!$issuerID){
       drupal_set_message(t('You have not chosen a bank for IDEAL payment. For security reasons your input is cleared, please try again'));
       drupal_goto('cart/checkout');
     }
-    
+
     //Send TransactionRequest
     $response = $iDEALConnector->RequestTransaction(
       $issuerID,
@@ -133,9 +133,9 @@ function uc_ideal_pro_transreq_call() {
       $description,
       $entranceCode,
       $expirationPeriod,
-      $merchantReturnURL 
+      $merchantReturnURL
     );
-    
+
     if (!$response->errCode){
   		$transactionID = $response->getTransactionID();
       //transactionID save in dbs
@@ -146,9 +146,9 @@ function uc_ideal_pro_transreq_call() {
   		$ISSURL = html_entity_decode($ISSURL);
 
   		//Redirect the browser to the issuer URL
-  		header("Location: $ISSURL"); 
+  		header("Location: $ISSURL");
   		exit();
-      
+
   	}
     else{
   		//TransactionRequest failed, inform the consumer
@@ -157,7 +157,7 @@ function uc_ideal_pro_transreq_call() {
   		drupal_set_message(t('Something went wrong in processing your IDEAL payment. IDEAL error:').'<br>'.$msg);
       drupal_goto('cart/checkout');
   	}
-    
+
     return($ideal_pro_form );
 
   }else{
@@ -179,7 +179,7 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 
 	//Create StatusRequest
 	$response = $iDEALConnector->RequestTransactionStatus($transaction_id);
-  
+
   //$transID = str_pad($transaction_id, 16, "0"); //Delete??
 
   if ($response->errCode){
@@ -191,7 +191,7 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 	}
 	elseif($response->status != 1){
 		//Transaction failed, inform the consumer
-		drupal_set_message(t('Your IDEAL payment has been canceled by you or by the IDEAL process. Please try again or go back to select another payment method.'), 'ERROR');
+		drupal_set_message(t('Your iDEAL payment has been canceled by you or by the iDEAL process. Please try again or go back to select another payment method.'), 'ERROR');
     if ($order_id == $_SESSION['ideal_pro_order_id']) { //Check if orer_id is valid
       // This lets us know it's a legitimate access of the review page.
       $_SESSION['do_review'] = TRUE;
@@ -207,16 +207,16 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
     //Here you should retrieve the order from the database, mark it as "payed"
     $order = uc_order_load($order_id);
     if ($order == FALSE) { //Check if order exist
-      watchdog('uc_ideal_pro_payment', t('iDeal payment completion attempted for non-existent order.'), WATCHDOG_ERROR);
+      watchdog('uc_ideal_pro_payment', t('iDEAL payment completion attempted for non-existent order.'), WATCHDOG_ERROR);
       return;
     }
     uc_order_update_status($order->order_id, uc_order_state_default('payment_received'));
-    
+
     //Todo??
     //uc_payment_enter($order_id, 'ideal_pro', $payment_amount, $order->uid, NULL, $comment);
     //uc_cart_complete_sale($order);
-    //uc_order_comment_save($order_id, 0, t('iDeal Pro reported a payment of !amount !currency.', array('!amount' => uc_currency_format($payment_amount, FALSE), '!currency' => $payment_currency)), 'admin');
-    
+    //uc_order_comment_save($order_id, 0, t('iDEAL Pro reported a payment of !amount !currency.', array('!amount' => uc_currency_format($payment_amount, FALSE), '!currency' => $payment_currency)), 'admin');
+
     unset($_SESSION['ideal_pro_order_id']);
     // This lets us know it's a legitimate access of the complete page.
     $_SESSION['do_complete'] = TRUE;
