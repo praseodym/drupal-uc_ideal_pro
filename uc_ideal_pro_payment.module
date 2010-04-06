@@ -1,14 +1,14 @@
-<?php 
+<?php
 // $Id$
 
 /**
  * @file
- * iDEAL payment module for Ubercart. No extra gateway needed. 
+ * iDEAL payment module for Ubercart. No extra gateway needed.
  * For iDEAL ING/PB Advanced & RABO Professional & Fortis iDEAL
  *
  * Development by Qrios | http://www.qrios.nl | c.kodde {at} qrios {dot} nl
- * 
- * 
+ *
+ *
  */
 
 
@@ -16,10 +16,10 @@
 $lib = uc_ideal_pro_get_lib();
 $path_module = drupal_get_path('module', 'uc_ideal_pro_payment');
 if ($lib == 'thinmpi') {
-  require_once($path_module .'/uc_deal_pro_thinmpi.inc.php');
+  require_once($path_module .'/uc_ideal_pro_thinmpi.inc.php');
 }
 elseif ($lib == 'connector') {
-  require_once($path_module .'/uc_deal_pro_connector.inc.php');
+  require_once($path_module .'/uc_ideal_pro_connector.inc.php');
 }
 
 /*******************************************************************************
@@ -33,14 +33,14 @@ function uc_ideal_pro_payment_menu() {
   $items = array();
 
     $items['cart/checkout/ideal_pro_dirreq'] = array(
-      'title' => t('IDEAL Payment Page'),
+      'title' => t('iDEAL Payment Page'),
       'page callback' => 'uc_ideal_pro_dirreq_form',
       'access arguments' => array('access content'),
       'type' => MENU_CALLBACK,
     );
 
     $items['cart/checkout/ideal_pro_transreq'] = array(
-      'title' => t('IDEAL Payment transfer request'),
+      'title' => t('iDEAL Payment transfer request'),
       'page callback' => 'uc_ideal_pro_transreq_call',
       'page arguments' => array(arg(1), arg(2), arg(3), arg(4)),
       'access arguments' => array('access content'),
@@ -48,7 +48,7 @@ function uc_ideal_pro_payment_menu() {
     );
 
     $items['cart/checkout/ideal_pro_statreq'] = array(
-      'title' => t('IDEAL Payment status request'),
+      'title' => t('iDEAL Payment status request'),
       'page callback' => 'uc_ideal_pro_statreq_call',
       'page arguments' => array(arg(1), arg(2), arg(3), arg(4)),
       'access arguments' => array('access content'),
@@ -69,9 +69,9 @@ function uc_ideal_pro_payment_menu() {
 function uc_ideal_pro_payment_payment_method() {
   $methods[] = array(
     'id' => 'ideal_pro_payment',
-    'name' => t('Ideal Pro Payment'),
-    'title' => '<img src="/'. drupal_get_path('module', 'uc_ideal_pro_payment') .'/ico_ideal.png" style="position: relative; top: 5px; margin-right: 4px;">'. t('Ideal Payment'),
-    'desc' => t('Ideal ING/PB Advanced and Rabo Professional payment method type.'),
+    'name' => t('iDEAL Pro Payment'),
+    'title' => '<img src="/'. drupal_get_path('module', 'uc_ideal_pro_payment') .'/ico_ideal.png" style="position: relative; top: 5px; margin-right: 4px;">'. t('iDEAL Payment'),
+    'desc' => t('iDEAL ING/PB Advanced and Rabo Professional payment method type.'),
     'callback' => 'uc_payment_method_ideal_pro',
     'weight' => 2,
     'checkout' => TRUE,
@@ -88,21 +88,21 @@ function uc_ideal_pro_payment_payment_method() {
 function uc_ideal_pro_payment_order($op, &$arg1, $arg2) {
   switch ($op) {
     case 'submit':
-        //Called at submit [Submit order]
-        
-        //Check if this is the chosen method
+      //Called at order submission [Submit order]
+
+      //Check if this is the chosen method
       if ($arg1->payment_method == 'ideal_pro_payment') {
         return theme(uc_ideal_pro_call($arg1, $arg2));
       }
-      case 'load':
-        //Called at openen Review order na  submit 'review order'
+    case 'load':
+      //Called at opening 'Review order' right after submit 'review order'
       break;
-    
+
     case 'save':
       //Called at submit [review order]
       if ($arg1->payment_method == 'ideal_pro_payment') {
         //Nothing??
-      }  
+      }
       break;
 
     case 'delete':
@@ -178,7 +178,7 @@ function uc_ideal_pro_payment_method_form($order) {
 function theme_uc_ideal_pro_payment_method_form($form) {
   $output = '<table class="order-edit-table"><tr><td class="ideal-pro-label">'
           . t('Description:') .'</td><td>'
-          . drupal_render($form['pm_ideal_pro_description']) 
+          . drupal_render($form['pm_ideal_pro_description'])
           .'</td></tr></table>';
   return $output;
 }
@@ -195,7 +195,7 @@ function uc_ideal_pro_payment_settings_form() {
     '#type' => 'textfield',
     '#title' => t('privatekey'),
     '#default_value' => variable_get('ideal_pro_privatekey', 'priv.pem'),
-    '#description' => t('The private key .pem file located in  */security.'),
+    '#description' => t('The private key .pem file located in */security.'),
   );
   $form['ideal_pro_privatekeypass'] = array(
     '#type' => 'textfield',
@@ -208,7 +208,7 @@ function uc_ideal_pro_payment_settings_form() {
     '#type' => 'textfield',
     '#title' => t('privatecert'),
     '#default_value' => variable_get('ideal_pro_privatecert', 'cert.cer'),
-    '#description' => t('The private certificate .cer file located in  */security.'),
+    '#description' => t('The private certificate .cer file located in */security.'),
     '#required' => TRUE,
   );
   $form['ideal_pro_authenticationtype'] = array(
@@ -229,7 +229,7 @@ function uc_ideal_pro_payment_settings_form() {
     '#type' => 'textfield',
     '#title' => t('acquirerurl'),
     '#default_value' => variable_get('ideal_pro_acquirerurl', 'ssl://idealtest.secure-ing.com:443/ideal/iDeal'),
-    '#description' => t('Address of the iDEAL acquiring server. Use ssl://idealtest.secure-ing.com:443/ideal/iDeal during integration/test. Use ssl://ideal.secure-ing.com:443/ideal/iDeal only for production. Look into integration documents for Rabo or Fortis equivalents.'),
+    '#description' => t('Address of the iDEAL acquiring server. Use ssl://idealtest.secure-ing.com:443/ideal/iDeal during integration/test. Use ssl://ideal.secure-ing.com:443/ideal/iDEAL only for production. Look into integration documents for Rabo or Fortis equivalents.'),
     '#required' => TRUE,
   );
   $form['ideal_pro_acquirertimeout'] = array(
@@ -270,10 +270,10 @@ function uc_ideal_pro_payment_settings_form() {
     '#type' => 'textfield',
     '#title' => t('language'),
     '#default_value' => variable_get('ideal_pro_language', 'nl'),
-    '#description' => t('Language is only used for showing errormessages in the prefered language. nl/en.'),
+    '#description' => t('Language is only used for showing error messages in the prefered language. nl/en.'),
     '#required' => TRUE,
   );
-  
+
   $form['ideal_pro_description_field'] = array(
     '#type' => 'fieldset',
     '#title' => t('Description'),
@@ -311,7 +311,6 @@ function uc_ideal_pro_payment_settings_form() {
   );
 
   return $form;
-
 }
 
 /*Redirect/return helper functions*/
@@ -322,7 +321,7 @@ function uc_ideal_pro_dirreq_form() {
     $_SESSION['ideal_pro_dirreq_form'] = FALSE;
     return ($ideal_pro_form .' ' );
   }
-  else{
+  else {
     drupal_goto('cart/');
   }
 }
@@ -330,6 +329,10 @@ function uc_ideal_pro_dirreq_form() {
 /*Get configuration*/
 function LoadConfiguration() {
   $url_base = url(NULL, array('absolute' => TRUE));
+  //Check url_base ends with /, else add (i18n)
+  if(substr($url_base, strlen($url_base)-1) != '/'){
+    $url_base = $url_base.'/';
+  }
   //Load configuration in array
   $arr_conf = array(
     'PRIVATEKEY' =>         filter_xss(variable_get('ideal_pro_privatekey', 'priv.pem')),
@@ -353,13 +356,13 @@ function LoadConfiguration() {
   if (variable_get('ideal_pro_description_check', FALSE) == TRUE) {
     $arr_conf['DESCRIPTION'] = variable_get('uc_store_name', 'Webshop') .' '. t('order#') . $_SESSION['ideal_pro_order_id'];
   }
-  else{
+  else {
     $arr_conf['DESCRIPTION'] = variable_get('uc_store_name', 'Webshop') .' '. t('order#') . $_SESSION['ideal_pro_order_id'];
   }
   if (variable_get('ideal_pro_entrancecode_check', FALSE) == TRUE) {
     $arr_conf['ENTRANCECODE'] = variable_get('ideal_pro_entrancecode', 15674022);
   }
-  else{
+  else {
     $arr_conf['ENTRANCECODE'] = $_SESSION['ideal_pro_order_id'];
   }
 
@@ -375,10 +378,10 @@ function uc_ideal_pro_get_lib() {
   elseif (file_exists($path_module .'/lib/iDEALConnector.php')) {
     $lib = 'connector'; //New ING
   }
-  else{
+  else {
     //No lib available
-    watchdog('uc_ideal_pro_payment', t('iDEAL PHP librairy not found in /lib.'), WATCHDOG_ERROR);
-    drupal_set_message(t('iDEAL PHP librairy not found in /lib.'), 'ERROR');
+    watchdog('uc_ideal_pro_payment', t('iDEAL PHP library not found in /lib.'), NULL, WATCHDOG_ERROR);
+    drupal_set_message(t('iDEAL PHP library not found in /lib.'), 'error');
     return;
   }
   return $lib;
