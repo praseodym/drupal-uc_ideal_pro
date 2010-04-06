@@ -71,7 +71,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   $redirect_message2 = t('You will be returned to our shop after completing your IDEAL payment transaction.');
 
   $orderid = $arg1->order_id;
-  $amount = $arg1->order_total * 100;   //amount *100
+  $amount = round($arg1->order_total * 100);   //amount *100
 
   $_SESSION['ideal_pro_order_id'] = $arg1->order_id;
   //Fill DirReq form session var
@@ -91,8 +91,8 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   ;
   //Fill TransReq session var
   $_SESSION['ideal_pro_transreq_data']= array(
-    'orderid' => $arg1->order_id,
-    'amount' => $arg1->order_total * 100,   //amount *100
+    'orderid' => $orderid,
+    'amount' => $amount,
   );
 
   drupal_goto('cart/checkout/ideal_pro_dirreq');
