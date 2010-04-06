@@ -90,7 +90,7 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   $redirect_cancelurl = $url_base.'cart/checkout/ideal_pro_cancel';
 
   $redirect_message1 = t('Please choose the bank you have an account with...');
-  $redirect_message2 = t('You will be returned to our shop after completing your IDEAL payment transaction.');
+  $redirect_message2 = t('You will be returned to our shop after completing your iDEAL payment transaction.');
 
   $orderid = $arg1->order_id;
   $amount = round($arg1->order_total * 100);   //amount * 100, rounded to prevent decimal positions.
@@ -135,7 +135,7 @@ function uc_ideal_pro_transreq_call() {
 
     $issuerID = check_plain($_POST['issuerID']);
     if(!$issuerID){
-      drupal_set_message(t('You have not chosen a bank for IDEAL payment. For security reasons your input is cleared, please try again'));
+      drupal_set_message(t('You have not chosen a bank for iDEAL payment. For security reasons your input is cleared, please try again'));
       drupal_goto('cart/checkout');
     }
 
@@ -170,7 +170,7 @@ function uc_ideal_pro_transreq_call() {
   	}else{
   		//TransactionRequest failed, inform the consumer
   		$Msg = $result->getErrorMessage();
-  		drupal_set_message(t('Something went wrong in processing your IDEAL payment. IDEAL error:').'<br>'.$Msg);
+  		drupal_set_message(t('Something went wrong in processing your iDEAL payment. iDEAL error:').'<br>'.$Msg);
       drupal_goto('cart/checkout');
   	}
 
@@ -206,13 +206,13 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 	{
 		//StatusRequest failed, let the consumer click to try again
     $msg = $result->errorMessage;
-    drupal_set_message(t('We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. IDEAL error: ').'<br>'.$msg, 'error');
+    drupal_set_message(t('We could not verify the payment status automaticaly, we will check your payment manualy, pleas contact us regarding this. iDEAL error: ').'<br>'.$msg, 'error');
     drupal_goto('cart/checkout');
 	}
 	else if(!$result->authenticated)
 	{
 		//Transaction failed, inform the consumer
-		drupal_set_message(t('Your IDEAL payment has been canceled by you or by the IDEAL process. Please try again or go back to select another payment method.'), 'error');
+		drupal_set_message(t('Your iDEAL payment has been canceled by you or by the iDEAL process. Please try again or go back to select another payment method.'), 'error');
     if ($order_id == $_SESSION['ideal_pro_order_id']) { //Check if orer_id is valid
       // This lets us know it's a legitimate access of the review page.
       $_SESSION['do_review'] = TRUE;
@@ -237,7 +237,7 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
     //Todo??
     //uc_payment_enter($order_id, 'ideal_pro', $payment_amount, $order->uid, NULL, $comment);
     //uc_cart_complete_sale($order);
-    //uc_order_comment_save($order_id, 0, t('iDeal Pro reported a payment of !amount !currency.', array('!amount' => uc_currency_format($payment_amount, FALSE), '!currency' => $payment_currency)), 'admin');
+    //uc_order_comment_save($order_id, 0, t('iDEAL Pro reported a payment of !amount !currency.', array('!amount' => uc_currency_format($payment_amount, FALSE), '!currency' => $payment_currency)), 'admin');
 
     unset($_SESSION['ideal_pro_order_id']);
     // This lets us know it's a legitimate access of the complete page.
