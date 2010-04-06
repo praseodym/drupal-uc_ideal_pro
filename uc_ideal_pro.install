@@ -43,18 +43,18 @@ function uc_ideal_pro_schema() {
         'default' => 0,
       ),
       'trx_id' => array(
-        'description' => t('The transaction ID from iDEAL.'),
+        'description' => t('The iDEAL transaction ID.'),
         'type' => 'varchar',
         'length' => 16,
         'not null' => TRUE,
         'default' => 0,
       ),
       'status' => array(
-        'description' => t('The transaction status from iDEAL.'),
+        'description' => t('The iDEAL transaction status.'),
         'type' => 'varchar',
         'length' => 10,
         'not null' => TRUE,
-        'default' => '',
+        'default' => 'OPEN',
       ),
       'received' => array(
         'description' => t('The transaction status timestamp.'),
@@ -66,6 +66,7 @@ function uc_ideal_pro_schema() {
     ),
     'indexes' => array(
       'order_id' => array('order_id'),
+      'status' => array('status', 'received'),
     ),
   );
 

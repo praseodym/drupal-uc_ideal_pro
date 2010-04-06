@@ -42,8 +42,39 @@ function uc_ideal_pro_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'uc_payment_methods_form') {
     $form['#submit'][] = 'uc_ideal_pro_payment_method_settings_submit';
   }
-  else if ($form_id == 'uc_cart_checkout_review_form' && !empty($_SESSION['uc_ideal_pro_bank'])) {
-    $form['submit']['#value'] = t('Submit Order And Pay Through iDEAL');
+  // No guarantee that uc_ideal_pro_bank wasn't set in an earlier order.
+  // else if ($form_id == 'uc_cart_checkout_review_form' && isset($_SESSION['uc_ideal_pro_bank'])) {
+  //   $form['submit']['#value'] = t('Submit order and pay trough iDEAL');
+  // }
+}
+
+/**
+ * Implementation of hook_cron().
+ */
+function uc_ideal_pro_cron() {
+  echo 'cron';
+  $result = db_query("SELECT order_id, trx_id, status FROM {uc_payment_ideal} WHERE status = 'OPEN' AND received < %d", strtotime('-30 minutes'));
+  
+  while ($trx = db_fetch_array($result)) {
+    $order = uc_order_load($trx['order_id']);
+    $status = _uc_ideal_pro_refresh_status($order, $trx['trx_id']);
+    
+    switch ($status) {
+      case IDEAL_TRX_STATUS_OPEN:
+        // iDEAL status should never be OPEN after 1 day
+        if ($order['created'] < strtotime('-24 hours')) {
+          watchdog('uc_ideal_pro', 'iDEAL payment creation error: @error', array('@error' => _uc_ideal_pro_get_errors($trx_req)), WATCHDOG_ERROR, url('admin/store/orders/' . $order->order_id));
+        }
+        break;
+        
+      case IDEAL_TRX_STATUS_SUCCESS:
+        if ($order->order_status == 'ideal_pending') {
+          // Add a comment to let sales team know this came in through the site.
+          uc_order_comment_save($order->order_id, 0, t('Order created through website.'), 'admin');
+          
+          uc_cart_complete_sale($order);
+        }
+    }
   }
 }
 
@@ -117,7 +148,7 @@ function uc_payment_method_ideal_pro($op, &$arg1) {
       }
       
     case 'order-view':
-      $trx_id = db_result(db_query("SELECT trx_id FROM {uc_payment_ideal} WHERE order_id = %d ORDER BY received ASC", $arg1->order_id));
+      $trx_id = db_result(db_query("SELECT trx_id FROM {uc_payment_ideal} WHERE order_id = %d", $arg1->order_id));
       if (empty($txn_id)) {
         $txn_id = t('Unknown');
       }
@@ -237,7 +268,8 @@ function uc_ideal_pro_pay($order) {
     drupal_goto('cart');
   }
   else {
-    db_query("INSERT INTO {uc_payment_ideal} (order_id, trx_id) VALUES(%d, '%s')", $order->order_id, $trx_id);
+    db_query("INSERT INTO {uc_payment_ideal} (order_id, trx_id, status, received) VALUES (%d, '%s', 'OPEN', %d)", $order->order_id, $trx_id, time());
+    uc_order_update_status($order->order_id, 'ideal_pending');
     
     $_SESSION['uc_ideal_pro_ec'] = $ec;
     $trx_req->doTransaction();
@@ -251,15 +283,14 @@ function uc_ideal_pro_complete($order) {
     drupal_goto('cart');
   }
   
-  $trx_id = db_result(db_query("SELECT trx_id FROM {uc_payment_ideal} WHERE order_id = %d", $order->order_id));
+  $trx = db_fetch_array(db_query("SELECT trx_id, status FROM {uc_payment_ideal} WHERE order_id = %d", $order->order_id));
+  
+  // Ensure that nobody is trying to mess around with orders.
   if (intval($_SESSION['cart_order']) != $order->order_id || 
       $_SESSION['uc_ideal_pro_ec'] != $_GET['ec'] ||
-      $trx_id != $_GET['trxid']) {
+      $trx['trx_id'] != $_GET['trxid']) {
     drupal_set_message(t('Thank you for your order! Unfortunately, your iDEAL payment could not be verified automatically. Please contact us for support.'), 'warning');
     drupal_goto('cart');
-    // print_r($_SESSION['uc_ideal_pro_ec'] . '<br>' . $_GET['ec'] . '<br>' . $trx_id . '<br>' . intval($_GET['trxid']));
-    // print_r('failed validation');
-    // exit();
   }
   
   // Ensure the payment method is iDEAL Advanced.
@@ -267,51 +298,29 @@ function uc_ideal_pro_complete($order) {
     drupal_goto('cart');
   }
   
-  _uc_ideal_pro_load_library();
-  
-  $status_req = new StatusRequest();
-  $status_req->setTransactionId($trx_id);
-  
-  $status_code = $status_req->doRequest();
-  
-  if($status_req->hasErrors()) {
-    watchdog('uc_ideal_pro', 'iDEAL payment finishing error: @error', array('@error' => _uc_ideal_pro_get_errors($status_req)), WATCHDOG_ERROR);
-    drupal_set_message(t('An error occurred handling your iDEAL payment. Please contact us for support.'));
+  // Ensure the transaction wasn't already completed by a cron run.
+  if ($trx['status'] != 'OPEN') {
+    uc_cart_empty(uc_cart_get_id());
+    // Clear our the session variables used to force the cart workflow.
+    unset($_SESSION['cart_order'], $_SESSION['do_complete'], $_SESSION['new_user']);
     drupal_goto('cart');
   }
-  else {
-    db_query("UPDATE {uc_payment_ideal} SET status = '%s', received = %d WHERE order_id = %d", $status_code, time(), $order->order_id);
-    
-    $status = _uc_ideal_pro_trx_status($status_code);
-    
-    if ($status == IDEAL_TRX_STATUS_SUCCESS) {
-      $acct = check_plain($status_req->getAccountNumber());
-      $name = check_plain($status_req->getAccountName());
-      $city = check_plain($status_req->getAccountCity());
-      
-      $context = array(
-        'revision' => 'formatted-original',
-        'type' => 'amount',
-      );
-      
-      $comment = t('Transaction with ID @trx_id from @acct (@name, @city)', array('@trx_id' => $trx_id, '@acct' => $acct, '@name' => $name, '@city' => $city));
-      uc_payment_enter($order->order_id, 'ideal_pro', $order->order_total, $order->uid, NULL, $comment);
-      
-      uc_order_comment_save($order->order_id, 0, t('Payment of @amount submitted through iDEAL.', array('@amount' => uc_price($order->order_total, $context))), 'order', 'payment_received');
-      uc_order_comment_save($order->order_id, 0, t('iDEAL reported payment of @amount from @acct (@name, @city).', array('@amount' => uc_price($order->order_total, $context), '@acct' => $acct, '@name' => $name, '@city' => $city)));
-      
+  
+  $status = _uc_ideal_pro_refresh_status($order, $trx['trx_id']);
+  
+  switch ($status) {
+    case IDEAL_TRX_STATUS_OPEN:
+    case IDEAL_TRX_STATUS_SUCCESS:
+      // If payment is still OPEN, we'll check it on the next cron run.
       $_SESSION['do_complete'] = TRUE;
       drupal_goto('cart/checkout/complete');
-    }
-    else {
+    case IDEAL_TRX_STATUS_INVALID:
+      drupal_set_message(t('An error occurred handling your iDEAL payment. Please contact us for support.'));
+      drupal_goto('cart');
+    default:
       unset($_SESSION['cart_order']);
-      if ($status != IDEAL_TRX_STATUS_CANCELLED) {
-        watchdog('uc_ideal_pro', 'iDEAL Payment failed: status: @status_code', array('@status_code' => $status_code), WATCHDOG_ERROR);
-      }  
-      uc_order_comment_save($order->order_id, 0, t('iDEAL transaction failed or cancelled: @status_code.', array('@status_code' => $status_code)));
       drupal_set_message(t('Your iDEAL payment was cancelled or has failed. Your order was not completed. Please contact us for support.'), 'warning');
       drupal_goto('cart');
-    }
   }
 }
 
@@ -415,7 +424,7 @@ function _uc_ideal_pro_get_issuers() {
   $issuers = variable_get('uc_ideal_pro_issuers', NULL);
   $issuers_fetched = variable_get('uc_ideal_pro_issuers_fetched', NULL);
   
-  if (!isset($issuers) || $issuers_fetched < strtotime('-24 Hours')) {
+  if (!isset($issuers) || $issuers_fetched < strtotime('-24 hours')) {
     _uc_ideal_pro_load_library();
     $issuer_req = new IssuerRequest();
     $issuers = $issuer_req->doRequest();
@@ -435,6 +444,58 @@ function _uc_ideal_pro_get_issuers() {
 function _uc_ideal_pro_reset_issuers() {
   variable_del('uc_ideal_pro_issuers');
   variable_del('uc_ideal_pro_issuers_fetched');
+}
+
+/**
+ * Fetch iDEAL status from acquirer and update order if needed.
+ * This function should never be called if the order already has status SUCCESS.
+ */
+function _uc_ideal_pro_refresh_status($order, $trx_id) {
+  _uc_ideal_pro_load_library();
+  
+  $status_req = new StatusRequest();
+  $status_req->setTransactionId($trx_id);
+  
+  $status_code = $status_req->doRequest();
+  $status = _uc_ideal_pro_trx_status($status_code);
+  
+  if ($status_req->hasErrors()) {
+    watchdog('uc_ideal_pro', 'iDEAL payment status request error: @error',
+      array('@error' => _uc_ideal_pro_get_errors($status_req)), WATCHDOG_ERROR);
+  }
+  else {
+    db_query("UPDATE {uc_payment_ideal} SET status = '%s', received = %d WHERE order_id = %d", $status_code, time(), $order->order_id);
+    
+    if ($status == IDEAL_TRX_STATUS_SUCCESS) {
+      $acct = check_plain($status_req->getAccountNumber());
+      $name = check_plain($status_req->getAccountName());
+      $city = check_plain($status_req->getAccountCity());
+      
+      $context = array(
+        'revision' => 'formatted-original',
+        'type' => 'amount',
+      );
+      
+      $comment = t('Transaction with ID @trx_id from @acct (@name, @city)',
+        array('@trx_id' => $trx_id, '@acct' => $acct, '@name' => $name, '@city' => $city));
+      uc_payment_enter($order->order_id, 'ideal_pro', $order->order_total, $order->uid, NULL, $comment);
+      
+      uc_order_comment_save($order->order_id, 0, t('Payment of @amount submitted through iDEAL.',
+        array('@amount' => uc_price($order->order_total, $context))), 'order', 'payment_received');
+      uc_order_comment_save($order->order_id, 0, t('iDEAL reported payment of @amount from @acct (@name, @city).',
+        array('@amount' => uc_price($order->order_total, $context), '@acct' => $acct, '@name' => $name, '@city' => $city)));
+    }
+    else if ($status != IDEAL_TRX_STATUS_OPEN) {
+      // Since status should not change if not OPEN, we can cancel this order.
+      uc_order_update_status($order->order_id, uc_order_state_default('canceled'));
+      uc_order_comment_save($order->order_id, 0, t('iDEAL payment failed with status @status_code',
+        array('@status_code' => $status_code)), 'order', 'canceled');
+      watchdog('uc_ideal_pro', 'iDEAL payment failed: status: @status_code',
+        array('@status_code' => $status_code), WATCHDOG_WARNING);
+    }
+  }
+  
+  return $status;
 }
 
 function _uc_ideal_pro_product_details($products) {
