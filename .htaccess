@@ -1,5 +1,0 @@
-#Dissalow access to all confidential files. If you are not on Apache, please take defensive mesures to prevent security holes.
-<Files ~ "\.(pem|crt|cer|key|conf|pubkey|txt|p12)$">
-  order allow,deny
-  deny from all
-</Files>

@@ -1,7 +1,0 @@
-; $Id$
-name = Ideal Payment Pro
-description = Receive payments through checkout via Ideal ING/Postbank Advanced,  Rabo Professional or Fortis iDEAL.
-package = Ubercart - payment
-core = 6.x
-
-
