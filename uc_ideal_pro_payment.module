@@ -380,7 +380,7 @@ function uc_ideal_pro_get_lib() {
   }
   else {
     //No lib available
-    watchdog('uc_ideal_pro_payment', t('iDEAL PHP library not found in /lib.'), NULL, WATCHDOG_ERROR);
+    watchdog('uc_ideal_pro_payment', 'iDEAL PHP library not found in /lib.', NULL, WATCHDOG_ERROR);
     drupal_set_message(t('iDEAL PHP library not found in /lib.'), 'error');
     return;
   }

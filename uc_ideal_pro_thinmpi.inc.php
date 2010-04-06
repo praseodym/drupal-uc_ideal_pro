@@ -228,7 +228,7 @@ function uc_ideal_pro_statreq_call($arg1, $arg2) {
 		//Here you should retrieve the order from the database, mark it as "payed"
     $order = uc_order_load($order_id);
     if ($order == FALSE) { //Check if order exist
-      watchdog('uc_ideal_pro_payment', t('iDeal payment completion attempted for non-existent order.'), NULL, WATCHDOG_ERROR);
+      watchdog('uc_ideal_pro_payment', 'iDEAL payment completion attempted for non-existent order.', NULL, WATCHDOG_ERROR);
       return;
     }
     //uc_order_update_status($order_id, 1);   *Uitgezet 281107 KK
