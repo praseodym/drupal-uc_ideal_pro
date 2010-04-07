@@ -1,5 +1,5 @@
 name = iDEAL Professional
-description = Receive payments through ING iDEAL Advanced, Rabobank iDEAL Professional and ABN iDEAL Zelfbouw.
+description = Receive payments through ING iDEAL Advanced, Rabobank iDEAL Professional or ABN iDEAL Zelfbouw.
 dependencies[] = uc_store
 dependencies[] = uc_payment
 package = Ubercart - payment

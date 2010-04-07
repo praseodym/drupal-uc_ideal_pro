@@ -25,7 +25,6 @@ define('IDEAL_TRX_STATUS_OPEN',      0x05);
  */
 function uc_ideal_pro_menu() {
   $items['uc_ideal_pro/complete/%uc_order'] = array(
-    'title' => 'iDEAL Payment Creation',
     'page callback' => 'uc_ideal_pro_complete',
     'page arguments' => array(2),
     'access arguments' => array('access content'),
@@ -52,7 +51,6 @@ function uc_ideal_pro_form_alter(&$form, &$form_state, $form_id) {
  * Implementation of hook_cron().
  */
 function uc_ideal_pro_cron() {
-  echo 'cron';
   $result = db_query("SELECT order_id, trx_id, status FROM {uc_payment_ideal} WHERE status = 'OPEN' AND received < %d", strtotime('-30 minutes'));
   
   while ($trx = db_fetch_array($result)) {
@@ -62,7 +60,7 @@ function uc_ideal_pro_cron() {
     switch ($status) {
       case IDEAL_TRX_STATUS_OPEN:
         // iDEAL status should never be OPEN after 1 day
-        if ($order['created'] < strtotime('-24 hours')) {
+        if ($order->created < strtotime('-24 hours')) {
           watchdog('uc_ideal_pro', 'iDEAL payment creation error: @error', array('@error' => _uc_ideal_pro_get_errors($trx_req)), WATCHDOG_ERROR, url('admin/store/orders/' . $order->order_id));
         }
         break;
@@ -95,7 +93,7 @@ function uc_ideal_pro_payment_method() {
     'name' => t('iDEAL Professional'),
     'title' => $title,
     'review' => t('iDEAL'),
-    'desc' => t('Let users pay through iDEAL (ING Advanced, Rabo Professional or ABN Zelfbouw).'),
+    'desc' => t('Let users pay through iDEAL (ING iDEAL Advanced, Rabobank iDEAL Professional or ABN iDEAL Zelfbouw).'),
     'callback' => 'uc_payment_method_ideal_pro',
     'weight' => 1,
     'checkout' => TRUE,
@@ -133,26 +131,20 @@ function uc_payment_method_ideal_pro($op, &$arg1) {
       return uc_strip_form($details);
       
     case 'cart-process':
-      if (isset($_POST['uc_ideal_pro_bank'])) {
-        $bank = check_plain($_POST['uc_ideal_pro_bank']);
-        if (!in_array($bank, array_keys(_uc_ideal_pro_get_issuers()))) {
-          drupal_set_message('iDEAL: Invalid bank selected.', 'error');
-          return false;
-        }
-        $_SESSION['uc_ideal_pro_bank'] = $bank;
-        return true;
-      }
-      else {
-        drupal_set_message('iDEAL: No bank selected.', 'error');
+      $bank = check_plain($_POST['uc_ideal_pro_bank']);
+      if (!in_array($bank, array_keys(_uc_ideal_pro_get_issuers()))) {
+        drupal_set_message('Select your bank for iDEAL payment.', 'error');
         return false;
       }
+      $_SESSION['uc_ideal_pro_bank'] = $bank;
+      return true;
       
     case 'order-view':
       $trx_id = db_result(db_query("SELECT trx_id FROM {uc_payment_ideal} WHERE order_id = %d", $arg1->order_id));
       if (empty($txn_id)) {
         $txn_id = t('Unknown');
       }
-      return t('Transaction ID:<br />@trx_id', array('@trx_id' => $trx_id));
+      return t('Transaction ID: @trx_id', array('@trx_id' => $trx_id));
 
     case 'settings':
       return uc_payment_method_ideal_pro_settings_form();
@@ -224,7 +216,7 @@ function uc_ideal_pro_payment_method_settings_submit($form, &$form_state) {
 
 
 function uc_payment_method_ideal_pro_form($form_state, $order) {
-  $issuers = _uc_ideal_pro_get_issuers();
+  $issuers = array(null => t('Select your bank...')) + _uc_ideal_pro_get_issuers();
   
   if (count($issuers) > 0) {
     $form['uc_ideal_pro_bank'] = array(
@@ -431,7 +423,7 @@ function _uc_ideal_pro_get_issuers() {
     $issuers = $issuer_req->doRequest();
 
     if($issuer_req->hasErrors()) {
-      watchdog('uc_ideal_pro', 'Error fetching issues list: @error', array('@error' => _uc_ideal_pro_get_errors(getErrors)), WATCHDOG_ERROR);
+      watchdog('uc_ideal_pro', 'Error fetching issuers list: @error', array('@error' => _uc_ideal_pro_get_errors(getErrors)), WATCHDOG_ERROR);
     }
     else {
       variable_set('uc_ideal_pro_issuers', $issuers);

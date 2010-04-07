@@ -7,8 +7,5 @@ Installation:
 - Copy your certificate and private key into this 'ssl' directory.
 - Enable the module and configure it on the Ubercart payment method settings page.
 
-TODO:
-- Dutch translation
-
 Author:
 Mark Janssen (praseodym)
