@@ -138,7 +138,7 @@ function uc_payment_method_ideal_pro($op, &$arg1) {
       }
       
       $bank = check_plain($_POST['uc_ideal_pro_bank']);
-      if (!in_array($bank, array_keys())) {
+      if (!in_array($bank, array_keys($issuers))) {
         drupal_set_message(t('Select your bank for iDEAL payment.'), 'error');
         return false;
       }
