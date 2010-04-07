@@ -131,11 +131,18 @@ function uc_payment_method_ideal_pro($op, &$arg1) {
       return uc_strip_form($details);
       
     case 'cart-process':
-      $bank = check_plain($_POST['uc_ideal_pro_bank']);
-      if (!in_array($bank, array_keys(_uc_ideal_pro_get_issuers()))) {
-        drupal_set_message('Select your bank for iDEAL payment.', 'error');
+      $issuers = _uc_ideal_pro_get_issuers();
+      if(!$issuers) {
+        drupal_set_message(t('iDEAL payment not available. Please choose an other payment method.'), 'error');
         return false;
       }
+      
+      $bank = check_plain($_POST['uc_ideal_pro_bank']);
+      if (!in_array($bank, array_keys())) {
+        drupal_set_message(t('Select your bank for iDEAL payment.'), 'error');
+        return false;
+      }
+      
       $_SESSION['uc_ideal_pro_bank'] = $bank;
       return true;
       
@@ -163,7 +170,7 @@ function uc_payment_method_ideal_pro_settings_form() {
     ),
     '#default_value' => variable_get('uc_ideal_pro_acquirer', 'simulator'),
   );
-  $form['uc_ideal_pro_debug_ipn'] = array(
+  $form['uc_ideal_pro_test'] = array(
     '#type' => 'checkbox',
     '#title' => t('Test mode'),
     '#default_value' => variable_get('uc_ideal_pro_test', TRUE),
@@ -216,14 +223,14 @@ function uc_ideal_pro_payment_method_settings_submit($form, &$form_state) {
 
 
 function uc_payment_method_ideal_pro_form($form_state, $order) {
-  $issuers = array(null => t('Select your bank...')) + _uc_ideal_pro_get_issuers();
+  $issuers = _uc_ideal_pro_get_issuers();
   
-  if (count($issuers) > 0) {
+  if ($issuers) {
     $form['uc_ideal_pro_bank'] = array(
       '#type' => 'select',
       '#title' => t('Bank'),
       '#description' => t('Select your bank for iDEAL payment.'),
-      '#options' => $issuers,
+      '#options' => array(null => t('Select your bank...')) + $issuers,
     );
   }
   else {
@@ -323,7 +330,7 @@ function uc_ideal_pro_execute_tests() {
   
   $issuers = _uc_ideal_pro_get_issuers();
   
-  if (count($issuers) == 0) {
+  if (!$issuers) {
     drupal_set_message(t('Tests failed: issuers list (directory request) could not be fetched. See watchdog for more information.'), 'error');
     return;
   }
@@ -423,7 +430,7 @@ function _uc_ideal_pro_get_issuers() {
     $issuers = $issuer_req->doRequest();
 
     if($issuer_req->hasErrors()) {
-      watchdog('uc_ideal_pro', 'Error fetching issuers list: @error', array('@error' => _uc_ideal_pro_get_errors(getErrors)), WATCHDOG_ERROR);
+      watchdog('uc_ideal_pro', 'Error fetching issuers list: @error', array('@error' => _uc_ideal_pro_get_errors($issuer_req)), WATCHDOG_ERROR);
     }
     else {
       variable_set('uc_ideal_pro_issuers', $issuers);

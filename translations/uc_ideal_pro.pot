@@ -1,0 +1,230 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright 2010 Mark Janssen <praseodym@gmail.com>
+# Generated from files:
+#  uc_ideal_pro.module: n/a
+#  uc_ideal_pro.info: n/a
+#  uc_ideal_pro.install: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2010-04-08 00:15+0200\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: uc_ideal_pro.module:71
+msgid "Order created through website."
+msgstr ""
+
+#: uc_ideal_pro.module:89
+msgid "iDEAL - Pay online through your own bank"
+msgstr ""
+
+#: uc_ideal_pro.module:93 uc_ideal_pro.info:0
+msgid "iDEAL Professional"
+msgstr ""
+
+#: uc_ideal_pro.module:95
+msgid "iDEAL"
+msgstr ""
+
+#: uc_ideal_pro.module:96
+msgid "Let users pay through iDEAL (ING iDEAL Advanced, Rabobank iDEAL Professional or ABN iDEAL Zelfbouw)."
+msgstr ""
+
+#: uc_ideal_pro.module:136;238
+msgid "iDEAL payment not available. Please choose an other payment method."
+msgstr ""
+
+#: uc_ideal_pro.module:142;232
+msgid "Select your bank for iDEAL payment."
+msgstr ""
+
+#: uc_ideal_pro.module:152
+msgid "Unknown"
+msgstr ""
+
+#: uc_ideal_pro.module:154
+msgid "Transaction ID: @trx_id"
+msgstr ""
+
+#: uc_ideal_pro.module:164
+msgid "Acquirer bank"
+msgstr ""
+
+#: uc_ideal_pro.module:175
+msgid "Test mode"
+msgstr ""
+
+#: uc_ideal_pro.module:180
+msgid "Execute tests"
+msgstr ""
+
+#: uc_ideal_pro.module:182
+msgid "Executes tests required to complete iDEAL acceptance."
+msgstr ""
+
+#: uc_ideal_pro.module:186
+msgid "Merchant ID"
+msgstr ""
+
+#: uc_ideal_pro.module:191
+msgid "Sub ID"
+msgstr ""
+
+#: uc_ideal_pro.module:196
+msgid "Certificates path"
+msgstr ""
+
+#: uc_ideal_pro.module:198
+msgid "This directory should NOT be publicly accessible. It is therefore recommended to place it outside your wwwroot."
+msgstr ""
+
+#: uc_ideal_pro.module:202
+msgid "Certificate filename"
+msgstr ""
+
+#: uc_ideal_pro.module:207
+msgid "Private key filename"
+msgstr ""
+
+#: uc_ideal_pro.module:212
+msgid "Private key password"
+msgstr ""
+
+#: uc_ideal_pro.module:231
+msgid "Bank"
+msgstr ""
+
+#: uc_ideal_pro.module:233
+msgid "Select your bank..."
+msgstr ""
+
+#: uc_ideal_pro.module:248
+msgid "Order number @id (@count products)."
+msgstr ""
+
+#: uc_ideal_pro.module:267;318
+msgid "An error occurred handling your iDEAL payment. Please contact us for support."
+msgstr ""
+
+#: uc_ideal_pro.module:292
+msgid "Thank you for your order! Unfortunately, your iDEAL payment could not be verified automatically. Please contact us for support."
+msgstr ""
+
+#: uc_ideal_pro.module:322
+msgid "Your iDEAL payment was cancelled or has failed. Your order was not completed. Please contact us for support."
+msgstr ""
+
+#: uc_ideal_pro.module:334
+msgid "Tests failed: issuers list (directory request) could not be fetched. See watchdog for more information."
+msgstr ""
+
+#: uc_ideal_pro.module:366
+msgid "Test @amount failed: transaction request error. See watchdog for more information."
+msgstr ""
+
+#: uc_ideal_pro.module:381
+msgid "Test @amount failed: status request did not return expected status. See watchdog for more information."
+msgstr ""
+
+#: uc_ideal_pro.module:391
+msgid "Test @amount failed: status request did not return expected error. See watchdog for more information."
+msgstr ""
+
+#: uc_ideal_pro.module:397
+msgid "All tests completed successfully."
+msgstr ""
+
+#: uc_ideal_pro.module:479
+msgid "Transaction with ID @trx_id from @acct (@name, @city)"
+msgstr ""
+
+#: uc_ideal_pro.module:483
+msgid "Payment of @amount submitted through iDEAL."
+msgstr ""
+
+#: uc_ideal_pro.module:485
+msgid "iDEAL reported payment of @amount from @acct (@name, @city)."
+msgstr ""
+
+#: uc_ideal_pro.module:491
+msgid "iDEAL payment failed with status @status_code"
+msgstr ""
+
+#: uc_ideal_pro.module:64;266;282;364;379;389;433;463;493
+msgid "uc_ideal_pro"
+msgstr ""
+
+#: uc_ideal_pro.module:64;266
+msgid "iDEAL payment creation error: @error"
+msgstr ""
+
+#: uc_ideal_pro.module:282
+msgid "User visited iDEAL complete page without a cart."
+msgstr ""
+
+#: uc_ideal_pro.module:364;379;389
+msgid "iDEAL testcase @amount failed with error: @error"
+msgstr ""
+
+#: uc_ideal_pro.module:433
+msgid "Error fetching issuers list: @error"
+msgstr ""
+
+#: uc_ideal_pro.module:463
+msgid "iDEAL payment status request error: @error"
+msgstr ""
+
+#: uc_ideal_pro.module:493
+msgid "iDEAL payment failed: status: @status_code"
+msgstr ""
+
+#: uc_ideal_pro.install:36
+msgid "Logs iDEAL transaction statuses."
+msgstr ""
+
+#: uc_ideal_pro.install:39
+msgid "The Ubercart order ID."
+msgstr ""
+
+#: uc_ideal_pro.install:46
+msgid "The iDEAL transaction ID."
+msgstr ""
+
+#: uc_ideal_pro.install:53
+msgid "The iDEAL transaction status."
+msgstr ""
+
+#: uc_ideal_pro.install:60
+msgid "The transaction status timestamp."
+msgstr ""
+
+#: (duplicate) uc_ideal_pro.install:19 
+msgid "iDEAL Professional requires the PHP <a href='!openssl_url'>OpenSSL</a> library."
+msgstr ""
+
+#: (duplicate) uc_ideal_pro.install:24 
+msgid "iDEAL Professional requires PHP version 5."
+msgstr ""
+
+#: (duplicate) uc_ideal_pro.install:83 
+msgid "iDEAL pending"
+msgstr ""
+
+#: uc_ideal_pro.info:0
+msgid "Receive payments through ING iDEAL Advanced, Rabobank iDEAL Professional or ABN iDEAL Zelfbouw."
+msgstr ""
+
+#: uc_ideal_pro.info:0
+msgid "Ubercart - payment"
+msgstr ""
+
