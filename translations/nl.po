@@ -7,13 +7,12 @@
 #  uc_ideal_pro.info: n/a
 #  uc_ideal_pro.install: n/a
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2010-04-08 00:15+0200\n"
-"PO-Revision-Date: 2010-04-08 00:15+0200\n"
-"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-04-09 00:22+0200\n"
+"PO-Revision-Date: 2010-04-09 00:23+0100\n"
+"Last-Translator: Mark Janssen <praseodym@gmail.com>\n"
 "Language-Team: Dutch <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -28,7 +27,8 @@ msgstr "Bestelling gecre&euml;erd via de website."
 msgid "iDEAL - Pay online through your own bank"
 msgstr "iDEAL - Online betalen met uw eigen bank"
 
-#: uc_ideal_pro.module:93 uc_ideal_pro.info:0
+#: uc_ideal_pro.module:93
+#: uc_ideal_pro.info:0
 msgid "iDEAL Professional"
 msgstr "iDEAL Professional"
 
@@ -38,15 +38,11 @@ msgstr "iDEAL"
 
 #: uc_ideal_pro.module:96
 msgid "Let users pay through iDEAL (ING iDEAL Advanced, Rabobank iDEAL Professional or ABN iDEAL Zelfbouw)."
-msgstr ""
-"Laat gebruikers betalen via iDEAL (ING iDEAL Advanced, Rabobank iDEAL "
-"Professional of ABN iDEAL Zelfbouw)."
+msgstr "Laat gebruikers betalen via iDEAL (ING iDEAL Advanced, Rabobank iDEAL Professional of ABN iDEAL Zelfbouw)."
 
 #: uc_ideal_pro.module:136;238
 msgid "iDEAL payment not available. Please choose an other payment method."
-msgstr ""
-"iDEAL-betaling is niet beschikbaar. Kies alstublieft een andere "
-"betaalmethode."
+msgstr "iDEAL-betaling is niet beschikbaar. Kies alstublieft een andere betaalmethode."
 
 #: uc_ideal_pro.module:142;232
 msgid "Select your bank for iDEAL payment."
@@ -90,9 +86,7 @@ msgstr "Pad naar certificaten"
 
 #: uc_ideal_pro.module:198
 msgid "This directory should NOT be publicly accessible. It is therefore recommended to place it outside your wwwroot."
-msgstr ""
-"Deze map mag NIET publiekelijk toegankelijk zijn. Het is daarom "
-"aangeraden deze map buiten de wwwroot te plaatsen."
+msgstr "Deze map mag NIET publiekelijk toegankelijk zijn. Het is daarom aangeraden deze map buiten de wwwroot te plaatsen."
 
 #: uc_ideal_pro.module:202
 msgid "Certificate filename"
@@ -120,46 +114,31 @@ msgstr "Bestellingnummer @id (@count producten)."
 
 #: uc_ideal_pro.module:267;318
 msgid "An error occurred handling your iDEAL payment. Please contact us for support."
-msgstr ""
-"Er is een fout opgetreden bij het afhandelen van uw iDEAL-betaling. "
-"Neem alstublieft contact met ons op voor ondersteuning."
+msgstr "Er is een fout opgetreden bij het afhandelen van uw iDEAL-betaling. Neem alstublieft contact met ons op voor ondersteuning."
 
 #: uc_ideal_pro.module:292
 msgid "Thank you for your order! Unfortunately, your iDEAL payment could not be verified automatically. Please contact us for support."
-msgstr ""
-"Bedankt voor uw bestelling! Helaas kon uw iDEAL-betaling niet "
-"automatisch geverifieerd worden. Neem contact met ons op voor "
-"ondersteuning."
+msgstr "Bedankt voor uw bestelling! Helaas kon uw iDEAL-betaling niet automatisch geverifieerd worden. Neem contact met ons op voor ondersteuning."
 
 #: uc_ideal_pro.module:322
 msgid "Your iDEAL payment was cancelled or has failed. Your order was not completed. Please contact us for support."
-msgstr ""
-"Uw iDEAL-betaling was geannuleerd of is mislukt. Uw bestelling was "
-"niet voltooid. Neem contact met ons op voor ondersteuning."
+msgstr "Uw iDEAL-betaling was geannuleerd of is mislukt. Uw bestelling was niet voltooid. Neem contact met ons op voor ondersteuning."
 
 #: uc_ideal_pro.module:334
 msgid "Tests failed: issuers list (directory request) could not be fetched. See watchdog for more information."
-msgstr ""
-"Tests mislukt: issuers-lijst (directory request) kon niet worden "
-"opgehaald. Zie log voor meer informatie."
+msgstr "Tests mislukt: issuers-lijst (directory request) kon niet worden opgehaald. Zie log voor meer informatie."
 
 #: uc_ideal_pro.module:366
 msgid "Test @amount failed: transaction request error. See watchdog for more information."
-msgstr ""
-"Test @amount mislukt: transactieverzoek mislukt. Zie log voor meer "
-"informatie."
+msgstr "Test @amount mislukt: transactieverzoek mislukt. Zie log voor meer informatie."
 
 #: uc_ideal_pro.module:381
 msgid "Test @amount failed: status request did not return expected status. See watchdog for more information."
-msgstr ""
-"Test @amount mislukt: statusverzoek retourneerde niet de verwachte "
-"waarde. Zie log voor meer informatie."
+msgstr "Test @amount mislukt: statusverzoek retourneerde niet de verwachte waarde. Zie log voor meer informatie."
 
 #: uc_ideal_pro.module:391
 msgid "Test @amount failed: status request did not return expected error. See watchdog for more information."
-msgstr ""
-"Test @amount mislukt: statusverzoek gaf niet de verwachte fout. Zie "
-"log voor meer informatie."
+msgstr "Test @amount mislukt: statusverzoek gaf niet de verwachte fout. Zie log voor meer informatie."
 
 #: uc_ideal_pro.module:397
 msgid "All tests completed successfully."
@@ -185,7 +164,11 @@ msgstr "iDEAL-betaling mislukt met status @status_code"
 msgid "uc_ideal_pro"
 msgstr "uc_ideal_pro"
 
-#: uc_ideal_pro.module:64;266
+#: uc_ideal_pro.module:64
+msgid "iDEAL status still OPEN after 24 hours."
+msgstr "iDEAL-status is nog steeds OPEN na 24 uur."
+
+#: uc_ideal_pro.module:266
 msgid "iDEAL payment creation error: @error"
 msgstr "Fout bij aanmaken iDEAL-betaling: @error"
 
@@ -229,25 +212,21 @@ msgstr "De iDEAL-transactiestatus."
 msgid "The transaction status timestamp."
 msgstr "De timestamp van de transactiestatus."
 
-#: (duplicate) uc_ideal_pro.install:19 
+#: (duplicate) uc_ideal_pro.install:19
 msgid "iDEAL Professional requires the PHP <a href='!openssl_url'>OpenSSL</a> library."
-msgstr ""
-"iDEAL Professional vereist de PHP <a "
-"href='!openssl_url'>OpenSSL</a>-bibliotheek."
+msgstr "iDEAL Professional vereist de PHP <a href='!openssl_url'>OpenSSL</a>-bibliotheek."
 
-#: (duplicate) uc_ideal_pro.install:24 
+#: (duplicate) uc_ideal_pro.install:24
 msgid "iDEAL Professional requires PHP version 5."
 msgstr "iDEAL Professional vereist PHP versie 5."
 
-#: (duplicate) uc_ideal_pro.install:83 
+#: (duplicate) uc_ideal_pro.install:83
 msgid "iDEAL pending"
 msgstr "In afwachting van iDEAL"
 
 #: uc_ideal_pro.info:0
 msgid "Receive payments through ING iDEAL Advanced, Rabobank iDEAL Professional or ABN iDEAL Zelfbouw."
-msgstr ""
-"Ontvang betalingen via ING iDEAL Advanced, Rabobank iDEAL Professional "
-"of ABN iDEAL Zelfbouw."
+msgstr "Ontvang betalingen via ING iDEAL Advanced, Rabobank iDEAL Professional of ABN iDEAL Zelfbouw."
 
 #: uc_ideal_pro.info:0
 msgid "Ubercart - payment"

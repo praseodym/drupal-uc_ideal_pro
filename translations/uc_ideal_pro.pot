@@ -11,7 +11,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2010-04-08 00:15+0200\n"
+"POT-Creation-Date: 2010-04-09 00:22+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -164,7 +164,11 @@ msgstr ""
 msgid "uc_ideal_pro"
 msgstr ""
 
-#: uc_ideal_pro.module:64;266
+#: uc_ideal_pro.module:64
+msgid "iDEAL status still OPEN after 24 hours."
+msgstr ""
+
+#: uc_ideal_pro.module:266
 msgid "iDEAL payment creation error: @error"
 msgstr ""
 
