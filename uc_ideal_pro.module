@@ -61,7 +61,7 @@ function uc_ideal_pro_cron() {
       case IDEAL_TRX_STATUS_OPEN:
         // iDEAL status should never be OPEN after 1 day
         if ($order->created < strtotime('-24 hours')) {
-          watchdog('uc_ideal_pro', 'iDEAL payment creation error: @error', array('@error' => _uc_ideal_pro_get_errors($trx_req)), WATCHDOG_ERROR, url('admin/store/orders/' . $order->order_id));
+          watchdog('uc_ideal_pro', 'iDEAL status still OPEN after 24 hours.', WATCHDOG_WARNING, url('admin/store/orders/' . $order->order_id));
         }
         break;
         
