@@ -64,8 +64,11 @@ function uc_ideal_pro_schema() {
         'default' => 0,
       ),
     ),
+    'primary key' => array('order_id'),
+    'unique keys' => array(
+      'vid'     => array('trx_id'),
+    ),
     'indexes' => array(
-      'order_id' => array('order_id'),
       'status' => array('status', 'received'),
     ),
   );

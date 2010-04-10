@@ -245,7 +245,7 @@ function uc_payment_method_ideal_pro_form($form_state, $order) {
 function uc_ideal_pro_pay($order) {
   _uc_ideal_pro_load_library();
   
-  $desc = t('Order number @id (@count products).',
+  $desc = t('Order @id (@count products)',
     array('@id' => $order->order_id, '@count' => $order->product_count));
   $ec = sha1($order->created . $order->order_total . $order->primary_email);
   $trx_req = new TransactionRequest();

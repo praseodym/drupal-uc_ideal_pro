@@ -109,8 +109,8 @@ msgid "Select your bank..."
 msgstr "Selecteer uw bank..."
 
 #: uc_ideal_pro.module:248
-msgid "Order number @id (@count products)."
-msgstr "Bestellingnummer @id (@count producten)."
+msgid "Order @id (@count products)"
+msgstr "Bestelling @id (@count producten)"
 
 #: uc_ideal_pro.module:267;318
 msgid "An error occurred handling your iDEAL payment. Please contact us for support."
