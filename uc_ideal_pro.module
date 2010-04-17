@@ -315,7 +315,7 @@ function uc_ideal_pro_complete($order) {
       $_SESSION['do_complete'] = TRUE;
       drupal_goto('cart/checkout/complete');
     case IDEAL_TRX_STATUS_INVALID:
-      drupal_set_message(t('An error occurred handling your iDEAL payment. Please contact us for support.'));
+      drupal_set_message(t('An error occurred handling your iDEAL payment. Please contact us for support.'), 'error');
       drupal_goto('cart');
     default:
       unset($_SESSION['cart_order']);
