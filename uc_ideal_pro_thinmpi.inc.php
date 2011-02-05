@@ -102,7 +102,6 @@ function uc_ideal_pro_call(&$arg1, $arg2) {
   '.$redirect_message1.'
   </div>
   <div class="ideal_pro_dirreq_container">
-  <div align="right"><img src="https://www.qspeed.nl/httpsimg/lock.gif" alt="Secure Payment by Qrios" /></div>
   <div align="center" class="ideal_pro_dirreq_form">
   '.$form_output.'
   </div>

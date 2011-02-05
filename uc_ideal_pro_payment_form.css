@@ -15,6 +15,7 @@ div.ideal_pro_dirreq_container {
   border: 1px solid #999;
   background-color: #e4e4e4;
   color: #333;
+  padding-top: 30px;
 }
 
 .ideal_pro_dirreq_message_field, .ideal_pro_dirreq_message_button {
