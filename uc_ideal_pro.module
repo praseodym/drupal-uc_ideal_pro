@@ -86,7 +86,7 @@ function uc_ideal_pro_cron() {
 function uc_ideal_pro_payment_method() {
   $path = base_path() . drupal_get_path('module', 'uc_ideal_pro');
   $title = '<img src="'. $path .'/ideal.gif" style="position: relative; top: 5px;"> '
-         . t('iDEAL - Pay online through your own bank');
+         . t('iDEAL — Pay online through your own bank');
          
   $methods[] = array(
     'id' => 'ideal_pro',
