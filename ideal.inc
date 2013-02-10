@@ -13,7 +13,7 @@
     http://www.ideal-simulator.nl/downloads/ideal-professional-core.zip
 
     Version:     0.5
-    Date:        25-3-2011
+    Date:        12-1-2012
     PHP:         PHP 5
 
     Suitable for:
@@ -177,44 +177,7 @@
       {
         $this->bABNAMRO = true;
         $this->sPublicCertificateFile = 'abnamro' . ($bTestMode ? '.test' : '') . '.cer';
-        $this->sAcquirerUrl = '';
-        
-        // With ABN AMRO, the AcquirerUrl depends on the request type
-        $sClass = get_class($this);
-
-        if(strcasecmp($sClass, 'issuerrequest') === 0)
-        {
-          if($bTestMode)
-          {
-            $this->sAcquirerUrl = 'ssl://itt.idealdesk.com:443/ITTEmulatorAcquirer/Directory.aspx';
-          }
-          else
-          {
-            $this->sAcquirerUrl = 'ssl://idealm.abnamro.nl:443/nl/issuerInformation/getIssuerInformation.xml';
-          }
-        }
-        elseif(strcasecmp($sClass, 'transactionrequest') === 0)
-        {
-          if($bTestMode)
-          {
-            $this->sAcquirerUrl = 'ssl://itt.idealdesk.com:443/ITTEmulatorAcquirer/Transaction.aspx';
-          }
-          else
-          {
-            $this->sAcquirerUrl = 'ssl://idealm.abnamro.nl:443/nl/acquirerTrxRegistration/getAcquirerTrxRegistration.xml';
-          }
-        }
-        elseif(strcasecmp($sClass, 'statusrequest') === 0)
-        {
-          if($bTestMode)
-          {
-            $this->sAcquirerUrl = 'ssl://itt.idealdesk.com:443/ITTEmulatorAcquirer/Status.aspx';
-          }
-          else
-          {
-            $this->sAcquirerUrl = 'ssl://idealm.abnamro.nl:443/nl/acquirerStatusInquiry/getAcquirerStatusInquiry.xml';
-          }
-        }
+        $this->sAcquirerUrl = 'ssl://abnamro'.($bTestMode ? '-test' : '').'.ideal-payment.de:443/ideal/iDeal';
       }
       elseif(strpos($sAcquirerName, 'sim') !== false) // IDEAL SIMULATOR
       {
@@ -995,4 +958,3 @@
       return false;
     }
   }
-?>
