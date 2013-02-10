@@ -479,7 +479,7 @@ function _uc_ideal_pro_refresh_status($order, $trx_id) {
       $comment = t('Transaction with ID @trx_id from @acct (@name, @city)',
         array('@trx_id' => $trx_id, '@acct' => $acct, '@name' => $name, '@city' => $city));
       uc_payment_enter($order->order_id, 'ideal_pro', $order->order_total, $order->uid, NULL, $comment);
-      
+      uc_order_update_status($order->order_id, uc_order_state_default('payment_received'));
       uc_order_comment_save($order->order_id, 0, t('Payment of @amount submitted through iDEAL.',
         array('@amount' => uc_price($order->order_total, $context))), 'order', 'payment_received');
       uc_order_comment_save($order->order_id, 0, t('iDEAL reported payment of @amount from @acct (@name, @city).',
