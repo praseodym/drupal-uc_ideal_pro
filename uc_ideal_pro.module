@@ -262,7 +262,7 @@ function uc_ideal_pro_pay($order) {
   
   $trx_id = $trx_req->doRequest();
   
-  if($trx_req->hasErrors()) {
+  if ($trx_req->hasErrors() || $trx_id == '') {
     watchdog('uc_ideal_pro', 'iDEAL payment creation error: @error', array('@error' => _uc_ideal_pro_get_errors($trx_req)), WATCHDOG_ERROR);
     drupal_set_message(t('An error occurred handling your iDEAL payment. Please contact us for support.'));
     drupal_goto('cart');
@@ -359,8 +359,8 @@ function uc_ideal_pro_execute_tests() {
     $trx_req->setIssuerId($issuer);
     $trx_req->setReturnUrl('http://example.com');
     $trx_id = $trx_req->doRequest();
-    
-    if ($trx_req->hasErrors()) {
+
+    if ($trx_req->hasErrors() || $trx_id == '') {
       watchdog('uc_ideal_pro', 'iDEAL testcase @amount failed with error: @error',
         array('@amount' => $amount, '@error' => _uc_ideal_pro_get_errors($trx_req)), WATCHDOG_ERROR);
       drupal_set_message(t('Test @amount failed: transaction request error. See watchdog for more information.', array('@amount' => $amount)), 'error');
@@ -429,7 +429,7 @@ function _uc_ideal_pro_get_issuers() {
     $issuer_req = new IssuerRequest();
     $issuers = $issuer_req->doRequest();
 
-    if($issuer_req->hasErrors()) {
+    if ($issuer_req->hasErrors()) {
       watchdog('uc_ideal_pro', 'Error fetching issuers list: @error', array('@error' => _uc_ideal_pro_get_errors($issuer_req)), WATCHDOG_ERROR);
     }
     else {
