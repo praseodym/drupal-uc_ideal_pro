@@ -8,13 +8,13 @@
  *
  * Thanks to Martijn Wieringa for his iDEAL library (ideal.inc).
  */
- 
-define('IDEAL_TRX_STATUS_INVALID',   0x00);
-define('IDEAL_TRX_STATUS_SUCCESS',   0x01);
+
+define('IDEAL_TRX_STATUS_INVALID', 0x00);
+define('IDEAL_TRX_STATUS_SUCCESS', 0x01);
 define('IDEAL_TRX_STATUS_CANCELLED', 0x02);
-define('IDEAL_TRX_STATUS_EXPIRED',   0x03);
-define('IDEAL_TRX_STATUS_FAILURE',   0x04);
-define('IDEAL_TRX_STATUS_OPEN',      0x05);
+define('IDEAL_TRX_STATUS_EXPIRED', 0x03);
+define('IDEAL_TRX_STATUS_FAILURE', 0x04);
+define('IDEAL_TRX_STATUS_OPEN', 0x05);
 
 /*******************************************************************************
  * Hook Functions (Drupal)
@@ -52,11 +52,11 @@ function uc_ideal_pro_form_alter(&$form, &$form_state, $form_id) {
  */
 function uc_ideal_pro_cron() {
   $result = db_query("SELECT order_id, trx_id, status FROM {uc_payment_ideal} WHERE status = 'OPEN' AND received < %d", strtotime('-30 minutes'));
-  
+
   while ($trx = db_fetch_array($result)) {
     $order = uc_order_load($trx['order_id']);
     $status = _uc_ideal_pro_refresh_status($order, $trx['trx_id']);
-    
+
     switch ($status) {
       case IDEAL_TRX_STATUS_OPEN:
         // iDEAL status should never be OPEN after 1 day
@@ -64,12 +64,12 @@ function uc_ideal_pro_cron() {
           watchdog('uc_ideal_pro', 'iDEAL status still OPEN after 24 hours.', WATCHDOG_WARNING, url('admin/store/orders/' . $order->order_id));
         }
         break;
-        
+
       case IDEAL_TRX_STATUS_SUCCESS:
         if ($order->order_status == 'ideal_pending') {
           // Add a comment to let sales team know this came in through the site.
           uc_order_comment_save($order->order_id, 0, t('Order created through website.'), 'admin');
-          
+
           uc_cart_complete_sale($order);
         }
     }
@@ -85,9 +85,9 @@ function uc_ideal_pro_cron() {
  */
 function uc_ideal_pro_payment_method() {
   $path = base_path() . drupal_get_path('module', 'uc_ideal_pro');
-  $title = '<img src="'. $path .'/ideal.gif" style="position: relative; top: 5px;"> '
-         . t('iDEAL — Pay online through your own bank');
-         
+  $title = '<img src="' . $path . '/ideal.gif" style="position: relative; top: 5px;"> '
+    . t('iDEAL — Pay online through your own bank');
+
   $methods[] = array(
     'id' => 'ideal_pro',
     'name' => t('iDEAL Professional'),
@@ -129,23 +129,23 @@ function uc_payment_method_ideal_pro($op, &$arg1) {
     case 'cart-details':
       $details = drupal_get_form('uc_payment_method_ideal_pro_form', $arg1);
       return uc_strip_form($details);
-      
+
     case 'cart-process':
       $issuers = _uc_ideal_pro_get_issuers();
-      if(!$issuers) {
+      if (!$issuers) {
         drupal_set_message(t('iDEAL payment not available. Please choose an other payment method.'), 'error');
-        return false;
+        return FALSE;
       }
-      
+
       $bank = check_plain($_POST['uc_ideal_pro_bank']);
       if (!in_array($bank, array_keys($issuers))) {
         drupal_set_message(t('Select your bank for iDEAL payment.'), 'error');
-        return false;
+        return FALSE;
       }
-      
+
       $_SESSION['uc_ideal_pro_bank'] = $bank;
-      return true;
-      
+      return TRUE;
+
     case 'order-view':
       $trx_id = db_result(db_query("SELECT trx_id FROM {uc_payment_ideal} WHERE order_id = %d", $arg1->order_id));
       if (empty($txn_id)) {
@@ -224,13 +224,13 @@ function uc_ideal_pro_payment_method_settings_submit($form, &$form_state) {
 
 function uc_payment_method_ideal_pro_form($form_state, $order) {
   $issuers = _uc_ideal_pro_get_issuers();
-  
+
   if ($issuers) {
     $form['uc_ideal_pro_bank'] = array(
       '#type' => 'select',
       '#title' => t('Bank'),
       '#description' => t('Select your bank for iDEAL payment.'),
-      '#options' => array(null => t('Select your bank...')) + $issuers,
+      '#options' => array(NULL => t('Select your bank...')) + $issuers,
     );
   }
   else {
@@ -244,24 +244,24 @@ function uc_payment_method_ideal_pro_form($form_state, $order) {
 
 function uc_ideal_pro_pay($order) {
   _uc_ideal_pro_load_library();
-  
+
   $desc = t('Order @id (@count products)',
     array('@id' => $order->order_id, '@count' => $order->product_count));
   $ec = sha1($order->created . $order->order_total . $order->primary_email);
   $trx_req = new TransactionRequest();
-  
+
   $trx_req->setOrderId($order->order_id);
   $trx_req->setOrderDescription($desc);
   $trx_req->setOrderAmount($order->order_total);
 
   $trx_req->setIssuerId($_SESSION['uc_ideal_pro_bank']);
   $trx_req->setEntranceCode($ec);
-  
+
   $return = url('uc_ideal_pro/complete/' . $order->order_id, Array('absolute' => TRUE));
   $trx_req->setReturnUrl($return);
-  
+
   $trx_id = $trx_req->doRequest();
-  
+
   if ($trx_req->hasErrors() || $trx_id == '') {
     watchdog('uc_ideal_pro', 'iDEAL payment creation error: @error', array('@error' => _uc_ideal_pro_get_errors($trx_req)), WATCHDOG_ERROR);
     drupal_set_message(t('An error occurred handling your iDEAL payment. Please contact us for support.'));
@@ -270,7 +270,7 @@ function uc_ideal_pro_pay($order) {
   else {
     db_query("INSERT INTO {uc_payment_ideal} (order_id, trx_id, status, received) VALUES (%d, '%s', 'OPEN', %d)", $order->order_id, $trx_id, time());
     uc_order_update_status($order->order_id, 'ideal_pending');
-    
+
     $_SESSION['uc_ideal_pro_ec'] = $ec;
     $trx_req->doTransaction();
   }
@@ -282,22 +282,23 @@ function uc_ideal_pro_complete($order) {
     watchdog('uc_ideal_pro', 'User visited iDEAL complete page without a cart.', array(), WATCHDOG_WARNING);
     drupal_goto('cart');
   }
-  
+
   $trx = db_fetch_array(db_query("SELECT trx_id, status FROM {uc_payment_ideal} WHERE order_id = %d", $order->order_id));
-  
+
   // Ensure that nobody is trying to mess around with orders.
-  if (intval($_SESSION['cart_order']) != $order->order_id || 
-      $_SESSION['uc_ideal_pro_ec'] != $_GET['ec'] ||
-      $trx['trx_id'] != $_GET['trxid']) {
+  if (intval($_SESSION['cart_order']) != $order->order_id ||
+    $_SESSION['uc_ideal_pro_ec'] != $_GET['ec'] ||
+    $trx['trx_id'] != $_GET['trxid']
+  ) {
     drupal_set_message(t('Thank you for your order! Unfortunately, your iDEAL payment could not be verified automatically. Please contact us for support.'), 'warning');
     drupal_goto('cart');
   }
-  
+
   // Ensure the payment method is iDEAL Advanced.
   if ($order->payment_method != 'ideal_pro') {
     drupal_goto('cart');
   }
-  
+
   // Ensure the transaction wasn't already completed by a cron run.
   if ($trx['status'] != 'OPEN') {
     uc_cart_empty(uc_cart_get_id());
@@ -305,9 +306,9 @@ function uc_ideal_pro_complete($order) {
     unset($_SESSION['cart_order'], $_SESSION['do_complete'], $_SESSION['new_user']);
     drupal_goto('cart');
   }
-  
+
   $status = _uc_ideal_pro_refresh_status($order, $trx['trx_id']);
-  
+
   switch ($status) {
     case IDEAL_TRX_STATUS_OPEN:
     case IDEAL_TRX_STATUS_SUCCESS:
@@ -327,17 +328,17 @@ function uc_ideal_pro_complete($order) {
 function uc_ideal_pro_execute_tests() {
   _uc_ideal_pro_reset_issuers();
   _uc_ideal_pro_load_library();
-  
+
   $issuers = _uc_ideal_pro_get_issuers();
-  
+
   if (!$issuers) {
     drupal_set_message(t('Tests failed: issuers list (directory request) could not be fetched. See watchdog for more information.'), 'error');
     return;
   }
-  
+
   $issuers = array_keys($issuers);
   $issuer = $issuers[0];
-  
+
   $tests_status = Array(
     1.00 => IDEAL_TRX_STATUS_SUCCESS,
     2.00 => IDEAL_TRX_STATUS_CANCELLED,
@@ -346,11 +347,11 @@ function uc_ideal_pro_execute_tests() {
     5.00 => IDEAL_TRX_STATUS_FAILURE,
     7.00 => IDEAL_TRX_STATUS_INVALID,
   );
-  
+
   $tests_error = Array(
     7.00 => Array('code' => 'SO1000', 'desc' => 'Failure in system - System generating error: Issuer'),
   );
-  
+
   foreach ($tests_status as $amount => $expected_status) {
     $trx_req = new TransactionRequest();
     $trx_req->setOrderId('Test ' . $amount);
@@ -368,24 +369,25 @@ function uc_ideal_pro_execute_tests() {
     }
     // Note: we do not actually need to redirect the user to the
     //       bank's site for the testcases to return the expected status.
-    
+
     $status_req = new StatusRequest();
     $status_req->setTransactionId($trx_id);
-    
+
     $status_code = $status_req->doRequest();
     $status = _uc_ideal_pro_trx_status($status_code);
-    
+
     if ($status != $expected_status) {
       watchdog('uc_ideal_pro', 'iDEAL testcase @amount failed with error: @error',
         array('@amount' => $amount, '@error' => _uc_ideal_pro_get_errors($status_req)), WATCHDOG_ERROR);
       drupal_set_message(t('Test @amount failed: status request did not return expected status. See watchdog for more information.', array('@amount' => $amount)), 'error');
       return;
     }
-    
+
     if ($status == IDEAL_TRX_STATUS_INVALID) {
       $error = $status_req->getErrors();
-      if ($tests_error[$amount]['code'] != $error[0]['code'] || 
-          $tests_error[$amount]['desc'] != $error[0]['desc']) {
+      if ($tests_error[$amount]['code'] != $error[0]['code'] ||
+        $tests_error[$amount]['desc'] != $error[0]['desc']
+      ) {
         watchdog('uc_ideal_pro', 'iDEAL testcase @amount failed with error: @error',
           array('@amount' => $amount, '@error' => _uc_ideal_pro_get_errors($status_req)), WATCHDOG_ERROR);
         drupal_set_message(t('Test @amount failed: status request did not return expected error. See watchdog for more information.', array('@amount' => $amount)), 'error');
@@ -393,25 +395,25 @@ function uc_ideal_pro_execute_tests() {
       }
     }
   }
-  
+
   drupal_set_message(t('All tests completed successfully.'));
 }
 
 function _uc_ideal_pro_load_library() {
   static $loaded = FALSE;
-  
+
   if (!$loaded) {
     define('IDEAL_ACQUIRER', variable_get('uc_ideal_pro_acquirer', 'simulator'));
     define('IDEAL_TEST_MODE', variable_get('uc_ideal_pro_test', TRUE));
     define('IDEAL_MERCHANT_ID', variable_get('uc_ideal_pro_mechant', '123456789'));
     define('IDEAL_SUB_ID', variable_get('uc_ideal_pro_sub', '0'));
     define('IDEAL_SECURE_PATH', variable_get('uc_ideal_pro_path', dirname(__FILE__) . '/ssl') . '/');
-    define('IDEAL_PRIVATE_CERTIFICATE_FILE', variable_get('uc_ideal_pro_cert', 'simulator-cert.cer')); 
+    define('IDEAL_PRIVATE_CERTIFICATE_FILE', variable_get('uc_ideal_pro_cert', 'simulator-cert.cer'));
     define('IDEAL_PRIVATE_KEY', variable_get('uc_ideal_pro_password', 'Password'));
     define('IDEAL_PRIVATE_KEY_FILE', variable_get('uc_ideal_pro_key', 'simulator-priv.pem'));
 
     require_once('ideal.inc');
-    
+
     $loaded = TRUE;
   }
 }
@@ -423,7 +425,7 @@ function _uc_ideal_pro_load_library() {
 function _uc_ideal_pro_get_issuers() {
   $issuers = variable_get('uc_ideal_pro_issuers', NULL);
   $issuers_fetched = variable_get('uc_ideal_pro_issuers_fetched', NULL);
-  
+
   if (!isset($issuers) || $issuers_fetched < strtotime('-24 hours')) {
     _uc_ideal_pro_load_library();
     $issuer_req = new IssuerRequest();
@@ -437,7 +439,7 @@ function _uc_ideal_pro_get_issuers() {
       variable_set('uc_ideal_pro_issuers_fetched', time());
     }
   }
-  
+
   return $issuers;
 }
 
@@ -452,30 +454,30 @@ function _uc_ideal_pro_reset_issuers() {
  */
 function _uc_ideal_pro_refresh_status($order, $trx_id) {
   _uc_ideal_pro_load_library();
-  
+
   $status_req = new StatusRequest();
   $status_req->setTransactionId($trx_id);
-  
+
   $status_code = $status_req->doRequest();
   $status = _uc_ideal_pro_trx_status($status_code);
-  
+
   if ($status_req->hasErrors()) {
     watchdog('uc_ideal_pro', 'iDEAL payment status request error: @error',
       array('@error' => _uc_ideal_pro_get_errors($status_req)), WATCHDOG_ERROR);
   }
   else {
     db_query("UPDATE {uc_payment_ideal} SET status = '%s', received = %d WHERE order_id = %d", $status_code, time(), $order->order_id);
-    
+
     if ($status == IDEAL_TRX_STATUS_SUCCESS) {
       $acct = check_plain($status_req->getAccountNumber());
       $name = check_plain($status_req->getAccountName());
       $city = check_plain($status_req->getAccountCity());
-      
+
       $context = array(
         'revision' => 'formatted-original',
         'type' => 'amount',
       );
-      
+
       $comment = t('Transaction with ID @trx_id from @acct (@name, @city)',
         array('@trx_id' => $trx_id, '@acct' => $acct, '@name' => $name, '@city' => $city));
       uc_payment_enter($order->order_id, 'ideal_pro', $order->order_total, $order->uid, NULL, $comment);
@@ -483,9 +485,14 @@ function _uc_ideal_pro_refresh_status($order, $trx_id) {
       uc_order_comment_save($order->order_id, 0, t('Payment of @amount submitted through iDEAL.',
         array('@amount' => uc_price($order->order_total, $context))), 'order', 'payment_received');
       uc_order_comment_save($order->order_id, 0, t('iDEAL reported payment of @amount from @acct (@name, @city).',
-        array('@amount' => uc_price($order->order_total, $context), '@acct' => $acct, '@name' => $name, '@city' => $city)));
+        array(
+          '@amount' => uc_price($order->order_total, $context),
+          '@acct' => $acct,
+          '@name' => $name,
+          '@city' => $city
+        )));
     }
-    else if ($status != IDEAL_TRX_STATUS_OPEN) {
+    elseif ($status != IDEAL_TRX_STATUS_OPEN) {
       // Since status should not change if not OPEN, we can cancel this order.
       uc_order_update_status($order->order_id, uc_order_state_default('canceled'));
       uc_order_comment_save($order->order_id, 0, t('iDEAL payment failed with status @status_code',
@@ -494,7 +501,7 @@ function _uc_ideal_pro_refresh_status($order, $trx_id) {
         array('@status_code' => $status_code), WATCHDOG_WARNING);
     }
   }
-  
+
   return $status;
 }
 
