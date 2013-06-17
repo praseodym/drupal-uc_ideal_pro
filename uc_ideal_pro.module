@@ -166,7 +166,8 @@ function uc_payment_method_ideal_pro_settings_form() {
       'simulator' => 'ideal-simulator.nl',
       'abnamro' => 'ABN Amro',
       'rabobank' => 'Rabobank',
-      'ing' => 'ING Bank'
+      'ing' => 'ING Bank',
+      'mollie' => 'Mollie'
     ),
     '#default_value' => variable_get('uc_ideal_pro_acquirer', 'simulator'),
   );
